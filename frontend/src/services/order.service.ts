@@ -49,13 +49,15 @@ export class OrderService {
         throw new Error("No valid access token available");
       }
 
-      // Get user email from token
+      // Get user email and role from token
       let userEmail = "";
+      let userRole = "";
       try {
         const payload = JSON.parse(atob(token.split(".")[1]));
         userEmail = payload.email;
+        userRole = payload.role;
       } catch (error) {
-        console.error("Error getting user email from token:", error);
+        console.error("Error getting user data from token:", error);
         throw new Error("Invalid token format");
       }
 
@@ -63,6 +65,7 @@ export class OrderService {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         "x-user-email": userEmail,
+        "x-user-role": userRole,
       };
     } catch (error) {
       console.error("Error getting auth headers:", error);
@@ -100,7 +103,7 @@ export class OrderService {
       const requestData = { ...data, userEmail };
       console.log("Creating order with data:", requestData);
 
-      const response = await axios.post(`${API_URL}/orders`, requestData, {
+      const response = await axios.post(`${API_URL}/api/orders`, requestData, {
         headers: await this.getAuthHeaders(),
       });
       console.log("Order creation response:", response.data);

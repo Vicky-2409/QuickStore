@@ -385,10 +385,12 @@ export class AdminService {
 
   async getAllOrders() {
     try {
-      const response = await apiClient.get(`/api/orders/all`);
-      return response.data?.orders;
+      const response = await axios.get(`${API_URL}/api/orders`, {
+        headers: await this.getAuthHeaders(),
+      });
+      return response.data.orders;
     } catch (error) {
-      console.error("Error fetching orders:", error);
+      console.error("Error fetching all orders:", error);
       throw error;
     }
   }
@@ -426,6 +428,37 @@ export class AdminService {
       return response.data;
     } catch (error) {
       console.error("Error assigning delivery partner:", error);
+      throw error;
+    }
+  }
+
+  private async getAuthHeaders() {
+    try {
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error("No valid access token available");
+      }
+
+      // Get user email and role from token
+      let userEmail = "";
+      let userRole = "";
+      try {
+        const payload = JSON.parse(atob(token.split(".")[1]));
+        userEmail = payload.email;
+        userRole = payload.role;
+      } catch (error) {
+        console.error("Error getting user data from token:", error);
+        throw new Error("Invalid token format");
+      }
+
+      return {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+        "x-user-email": userEmail,
+        "x-user-role": userRole,
+      };
+    } catch (error) {
+      console.error("Error getting auth headers:", error);
       throw error;
     }
   }

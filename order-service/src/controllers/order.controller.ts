@@ -108,23 +108,31 @@ export class OrderController {
   async getOrders(req: Request, res: Response) {
     try {
       const userEmail = req.headers["x-user-email"] as string;
+      const userRole = req.headers["x-user-role"] as string;
+
       if (!userEmail) {
-        return res.status(400).json({
+        return res.status(401).json({
           success: false,
           message: "User email is required",
         });
       }
 
-      const orders = await this.orderService.getOrders(userEmail);
-      return res.status(200).json({
-        success: true,
-        orders,
-      });
-    } catch (error: any) {
+      let orders;
+      if (userRole === "admin") {
+        // Admin can see all orders
+        orders = await this.orderService.getAllOrders();
+      } else {
+        // Regular users can only see their orders
+        orders = await this.orderService.getOrdersByUserEmail(userEmail);
+      }
+
+      res.json({ success: true, orders });
+    } catch (error) {
       console.error("Error in getOrders:", error);
-      return res.status(500).json({
+      res.status(500).json({
         success: false,
-        message: error.message || "Internal server error",
+        message: "Error fetching orders",
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }
@@ -149,6 +157,7 @@ export class OrderController {
     try {
       const { orderId } = req.params;
       const userEmail = req.headers["x-user-email"] as string;
+      const userRole = req.headers["x-user-role"] as string;
 
       if (!userEmail) {
         return res.status(401).json({
@@ -159,7 +168,12 @@ export class OrderController {
 
       const order = await this.orderService.getOrderById(orderId);
 
-      // Check if the order belongs to the user
+      // Allow delivery partners to access any order
+      if (userRole === "delivery_partner") {
+        return res.json({ success: true, order });
+      }
+
+      // For regular users, check if the order belongs to them
       if (order.userEmail !== userEmail) {
         return res.status(403).json({
           success: false,

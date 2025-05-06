@@ -83,9 +83,18 @@ export class OrderService implements IOrderService {
 
   async getAllOrders(): Promise<IOrder[]> {
     try {
-      return await this.orderRepository.findAll();
+      return await Order.find().sort({ createdAt: -1 });
     } catch (error) {
-      console.error("Error fetching all orders:", error);
+      console.error("Error in getAllOrders:", error);
+      throw error;
+    }
+  }
+
+  async getOrdersByUserEmail(userEmail: string): Promise<IOrder[]> {
+    try {
+      return await Order.find({ userEmail }).sort({ createdAt: -1 });
+    } catch (error) {
+      console.error("Error in getOrdersByUserEmail:", error);
       throw error;
     }
   }
