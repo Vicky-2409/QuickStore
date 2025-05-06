@@ -180,7 +180,7 @@ export class OrderService {
   }
 
   async getPendingOrders(): Promise<Order[]> {
-    const response = await axios.get(`${API_URL}/delivery/orders/pending`, {
+    const response = await axios.get(`${API_URL}/delivery/order/pending`, {
       headers: await this.getAuthHeaders(),
     });
     return response.data;
@@ -193,7 +193,7 @@ export class OrderService {
     try {
       const headers = await this.getAuthHeaders();
       const response = await axios.post(
-        `${API_URL}/delivery/orders/assign`,
+        `${API_URL}/delivery/order/assign`,
         {
           orderId,
           partnerId,
@@ -264,7 +264,7 @@ export class OrderService {
   async getActiveOrder(partnerEmail: string): Promise<Order | null> {
     try {
       console.log("Fetching active order for partner:", partnerEmail);
-      const response = await axios.get(`${API_URL}/delivery/orders/active`, {
+      const response = await axios.get(`${API_URL}/delivery/order/active`, {
         headers: {
           ...(await this.getAuthHeaders()),
           "x-partner-email": partnerEmail,

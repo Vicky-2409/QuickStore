@@ -53,7 +53,7 @@ export const ROUTES = {
   DELIVERY: {
     LOGIN: "/delivery/login",
     DASHBOARD: "/delivery/dashboard",
-    ORDERS: "/delivery/orders",
+    ORDERS: "/delivery/order",
     PROFILE: "/delivery/profile",
   },
 };

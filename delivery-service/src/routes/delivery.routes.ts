@@ -8,39 +8,39 @@ export const createDeliveryRoutes = (
 
   // Order routes
   router.get(
-    "/orders",
+    "/order",
     deliveryController.getAllOrders.bind(deliveryController)
   );
   router.post(
-    "/orders",
+    "/order",
     deliveryController.createOrder.bind(deliveryController)
   );
   router.get(
-    "/orders/pending",
+    "/order/pending",
     deliveryController.getPendingOrders.bind(deliveryController)
   );
   router.get(
-    "/orders/active",
+    "/order/active",
     deliveryController.getActiveOrder.bind(deliveryController)
   );
   router.get(
-    "/orders/completed",
+    "/order/completed",
     deliveryController.getCompletedOrders.bind(deliveryController)
   );
   router.get(
-    "/orders/:orderId",
+    "/order/:orderId",
     deliveryController.getOrder.bind(deliveryController)
   );
   router.get(
-    "/orders/customer/:email",
+    "/order/customer/:email",
     deliveryController.getOrdersByCustomerEmail.bind(deliveryController)
   );
   router.put(
-    "/orders/:orderId/status",
+    "/order/:orderId/status",
     deliveryController.updateOrderStatus.bind(deliveryController)
   );
   router.post(
-    "/orders/assign",
+    "/order/assign",
     deliveryController.assignDeliveryPartner.bind(deliveryController)
   );
 

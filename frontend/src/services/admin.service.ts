@@ -395,7 +395,7 @@ export class AdminService {
 
   async getAllOrdersFromDeliveryService() {
     try {
-      const response = await apiClient.get(`/api/delivery/orders`);
+      const response = await apiClient.get(`/api/delivery/order`);
       console.log(response.data);
       return response.data;
     } catch (error) {
@@ -407,7 +407,7 @@ export class AdminService {
   async updateOrderStatus(orderId: string, status: string) {
     try {
       const response = await axios.put(
-        `${API_URL}/api/delivery/orders/${orderId}/status`,
+        `${API_URL}/api/delivery/order/${orderId}/status`,
         { status }
       );
       return response.data;
@@ -420,7 +420,7 @@ export class AdminService {
   async assignDeliveryPartner(orderId: string, deliveryPartnerId: string) {
     try {
       const response = await axios.post(
-        `${API_URL}/api/delivery/orders/assign`,
+        `${API_URL}/api/delivery/order/assign`,
         { orderId, deliveryPartnerId }
       );
       return response.data;

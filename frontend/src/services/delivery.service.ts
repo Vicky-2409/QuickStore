@@ -47,7 +47,7 @@ class DeliveryService {
   async getOrdersByCustomerEmail(email: string): Promise<Order[]> {
     try {
       const response = await axios.get(
-        `${this.baseUrl}/orders/customer/${email}`
+        `${this.baseUrl}/order/customer/${email}`
       );
       return response.data;
     } catch (error) {
@@ -82,7 +82,7 @@ class DeliveryService {
 
   async getPendingOrders(): Promise<Order[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}/orders/pending`, {
+      const response = await axios.get(`${this.baseUrl}/order/pending`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -97,7 +97,7 @@ class DeliveryService {
 
   async getOrderById(orderId: string): Promise<Order> {
     try {
-      const response = await axios.get(`${this.baseUrl}/orders/${orderId}`, {
+      const response = await axios.get(`${this.baseUrl}/order/${orderId}`, {
         withCredentials: true,
         headers: {
           "Content-Type": "application/json",
@@ -113,7 +113,7 @@ class DeliveryService {
   async acceptOrder(orderId: string, partnerEmail: string): Promise<void> {
     try {
       await axios.post(
-        `${this.baseUrl}/orders/${orderId}/assign`,
+        `${this.baseUrl}/order/${orderId}/assign`,
         { partnerEmail },
         {
           withCredentials: true,
@@ -131,7 +131,7 @@ class DeliveryService {
   async updateOrderStatus(orderId: string, status: string): Promise<Order> {
     try {
       const response = await axios.put(
-        `${this.baseUrl}/orders/${orderId}/status`,
+        `${this.baseUrl}/order/${orderId}/status`,
         { status }
       );
       return response.data;
@@ -143,7 +143,7 @@ class DeliveryService {
 
   async getCompletedOrdersByPartner(email: string): Promise<Order[]> {
     try {
-      const response = await axios.get(`${this.baseUrl}/orders/completed`, {
+      const response = await axios.get(`${this.baseUrl}/order/completed`, {
         params: { deliveryPartnerEmail: email },
       });
       return response.data;
