@@ -91,7 +91,7 @@ io.on("connection", (socket: Socket) => {
   // Forward order acceptance events
   socket.on("accept_order", (data: { orderId: string; partnerId: string }) => {
     console.log(`[${new Date().toISOString()}] Order accepted:`, data);
-    // Forward to delivery service
+    // Forward to delivery servic
     io.emit("accept_order", data);
   });
 

@@ -17,7 +17,7 @@ import productRoutes from "./routes/product.routes";
 import categoryRoutes from "./routes/category.routes";
 import statsRoutes from "./routes/stats.routes";
 import morgan from "morgan";
-// Declare global product service
+// Declare global product servic
 declare global {
   var productService: ProductService;
 }
