@@ -11,7 +11,7 @@ import { PaymentSubscriber } from "./events/subscribers/payment.subscriber";
 import { PaymentService } from "./services/payment.service";
 import { PaymentRepository } from "./repositories/payment.repository";
 
-// Load environment variables first
+// Load environment variables firsts
 config();
 
 // Validate required environment variable

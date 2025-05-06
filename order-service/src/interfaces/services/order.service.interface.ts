@@ -34,9 +34,13 @@ export interface CreateOrderDTO {
 export interface IOrderService {
   createOrder(data: CreateOrderDTO): Promise<IOrder>;
   getOrders(userEmail: string): Promise<IOrder[]>;
+  getOrdersByUserEmail(userEmail: string): Promise<IOrder[]>;
   getAllOrders(): Promise<IOrder[]>;
-  updateOrderStatus(orderId: string, status: OrderStatus): Promise<void>;
   getOrderById(orderId: string): Promise<IOrder>;
+  updateOrderStatus(orderId: string, status: OrderStatus): Promise<void>;
   getUnassignedOrders(): Promise<IOrder[]>;
-  updatePaymentStatus(orderId: string, status: PaymentStatus): Promise<void>;
+  updatePaymentStatus(
+    orderId: string,
+    status: "completed" | "failed"
+  ): Promise<void>;
 }
