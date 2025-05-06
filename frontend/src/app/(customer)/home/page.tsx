@@ -53,7 +53,38 @@ const HomePage: React.FC = () => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  const recentOrders = orders.slice(0, 5);
+  const recentOrders = orders?.slice(0, 5) || [];
+
+  if (status === "loading") {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          <div className="h-32 bg-gray-200 rounded-3xl mb-16"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="bg-gray-200 rounded-xl p-6 h-40"></div>
+            ))}
+          </div>
+          <div className="bg-gray-200 rounded-xl p-6 h-96"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "failed") {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+          <h2 className="text-red-600 text-lg font-semibold mb-2">
+            Error Loading Orders
+          </h2>
+          <p className="text-red-500">
+            Failed to load your orders. Please try again later.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const columns = [
     {
@@ -61,7 +92,7 @@ const HomePage: React.FC = () => {
       dataIndex: "_id",
       key: "_id",
       render: (id: string) => (
-        <span className="font-medium">{id.substring(0, 8)}...</span>
+        <span className="font-medium">{id?.substring(0, 8)}...</span>
       ),
     },
     {
@@ -91,7 +122,7 @@ const HomePage: React.FC = () => {
           <span
             className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[status]}`}
           >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
+            {status?.charAt(0).toUpperCase() + status?.slice(1)}
           </span>
         );
       },
@@ -107,10 +138,12 @@ const HomePage: React.FC = () => {
   ];
 
   const orderStats = {
-    total: orders.length,
-    pending: orders.filter((order: Order) => order.status === "pending").length,
-    delivered: orders.filter((order: Order) => order.status === "delivered")
-      .length,
+    total: orders?.length || 0,
+    pending:
+      orders?.filter((order: Order) => order.status === "pending").length || 0,
+    delivered:
+      orders?.filter((order: Order) => order.status === "delivered").length ||
+      0,
   };
 
   return (

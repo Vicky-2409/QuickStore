@@ -45,6 +45,7 @@ export class OrderController {
         });
       }
 
+      // Get user email from body or headers
       const userEmail = req.body.userEmail || req.headers["x-user-email"];
       if (!userEmail) {
         return res.status(400).json({
@@ -147,10 +148,34 @@ export class OrderController {
   async getOrderById(req: Request, res: Response) {
     try {
       const { orderId } = req.params;
+      const userEmail = req.headers["x-user-email"] as string;
+
+      if (!userEmail) {
+        return res.status(401).json({
+          success: false,
+          message: "User email is required",
+        });
+      }
+
       const order = await this.orderService.getOrderById(orderId);
+
+      // Check if the order belongs to the user
+      if (order.userEmail !== userEmail) {
+        return res.status(403).json({
+          success: false,
+          message: "You don't have permission to access this order",
+        });
+      }
+
       return res.json({ success: true, order });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching order:", error);
+      if (error.message === "Order not found") {
+        return res.status(404).json({
+          success: false,
+          message: "Order not found",
+        });
+      }
       return res.status(500).json({
         success: false,
         message: "Failed to fetch order",

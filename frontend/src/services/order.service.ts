@@ -120,7 +120,7 @@ export class OrderService {
     try {
       const headers = await this.getAuthHeaders();
       console.log("Request headers:", headers);
-      const response = await axios.get(`${API_URL}/orders`, {
+      const response = await axios.get(`${API_URL}/api/orders`, {
         headers,
       });
       console.log("Response:", response.data);
@@ -142,7 +142,7 @@ export class OrderService {
   async getOrderById(orderId: string): Promise<Order> {
     try {
       console.log("Fetching order by ID:", orderId);
-      const response = await axios.get(`${API_URL}/orders/${orderId}`, {
+      const response = await axios.get(`${API_URL}/api/orders/${orderId}`, {
         headers: await this.getAuthHeaders(),
       });
       console.log("Order details response:", response.data);
@@ -159,7 +159,7 @@ export class OrderService {
   ): Promise<Order> {
     try {
       const response = await axios.put(
-        `${API_URL}/orders/${orderId}/status`,
+        `${API_URL}/api/orders/${orderId}/status`,
         { status },
         {
           headers: await this.getAuthHeaders(),
@@ -173,7 +173,7 @@ export class OrderService {
   }
 
   async getOrder(orderId: string): Promise<Order> {
-    const response = await axios.get(`${API_URL}/orders/${orderId}`, {
+    const response = await axios.get(`${API_URL}/api/orders/${orderId}`, {
       headers: await this.getAuthHeaders(),
     });
     return response.data.order;

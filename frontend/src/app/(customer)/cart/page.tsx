@@ -21,8 +21,8 @@ import { AppDispatch } from "@/store/store";
 export default function CartPage() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const items = useSelector(selectCartItems);
-  const total = useSelector(selectCartTotal);
+  const items = useSelector(selectCartItems) || [];
+  const total = useSelector(selectCartTotal) || 0;
   const status = useSelector(selectCartStatus);
   const error = useSelector(selectCartError);
 
@@ -32,8 +32,11 @@ export default function CartPage() {
       return;
     }
     const handleFetchCart = async () => {
-      // Dispatch the async thunk action
-      await dispatch(fetchCart()); // Make sure the dispatch function is correctly typed
+      try {
+        await dispatch(fetchCart());
+      } catch (error) {
+        console.error("Error fetching cart:", error);
+      }
     };
     handleFetchCart();
   }, [dispatch, router]);
@@ -47,7 +50,7 @@ export default function CartPage() {
         ).unwrap();
 
         // Update local state immediately
-        const updatedItems = items.map((item) =>
+        const updatedItems = (items || []).map((item) =>
           item.product._id === productId
             ? { ...item, quantity: newQuantity }
             : item
@@ -85,7 +88,7 @@ export default function CartPage() {
       await dispatch(removeFromCart(productId)).unwrap();
 
       // Update local state immediately
-      const updatedItems = items.filter(
+      const updatedItems = (items || []).filter(
         (item) => item.product._id !== productId
       );
       const newTotal = updatedItems.reduce(
@@ -150,7 +153,7 @@ export default function CartPage() {
         <h1 className="text-3xl font-bold text-gray-900">Your Cart</h1>
       </div>
 
-      {items.length === 0 ? (
+      {!items || items.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl shadow-sm">
           <div className="flex justify-center mb-4">
             <ShoppingBag className="w-16 h-16 text-gray-300" />

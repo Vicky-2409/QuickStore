@@ -24,16 +24,17 @@ export const createProxyRoutes = (): Router => {
   const deliveryProxy = createProxy(servicesConfig.delivery);
   router.use("/api/delivery", deliveryProxy);
 
+  // Order service routes (public for creation, protected for other operations)
+  const orderProxy = createProxy(servicesConfig.orders);
+  router.post("/api/orders", orderProxy); // Allow POST without auth
+  router.use("/api/orders", authenticate, orderProxy); // Protect other operations
+
   // Protected routes
   router.use(authenticate);
 
   // User service routes
   const userProxy = createProxy(servicesConfig.users);
   router.use("/api/users", userProxy);
-
-  // Order service routes
-  const orderProxy = createProxy(servicesConfig.orders);
-  router.use("/api/orders", orderProxy);
 
   // Payment service routes
   const paymentProxy = createProxy(servicesConfig.payments);
