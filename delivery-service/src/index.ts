@@ -26,7 +26,7 @@ import { OrderRepository } from "./repositories/order.repository";
 import { DeliveryPartnerRepository } from "./repositories/delivery-partner.repository";
 import { createDeliveryRoutes } from "./routes/delivery.routes";
 
-// Load environment variables
+// Load environment variable
 dotenv.config();
 
 const app = express();
