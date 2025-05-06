@@ -11,10 +11,10 @@ import { PaymentSubscriber } from "./events/subscribers/payment.subscriber";
 import { PaymentService } from "./services/payment.service";
 import { PaymentRepository } from "./repositories/payment.repository";
 
-// Load environment variables first
+// Load environment variables firs
 config();
 
-// Validate required environment variables
+// Validate required environment variable
 const requiredEnvVars = [
   "MONGO_URI",
   "RABBITMQ_URL",
