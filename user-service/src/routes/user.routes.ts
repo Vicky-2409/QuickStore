@@ -9,7 +9,7 @@ import {
 export const createUserRoutes = (userController: UserController): Router => {
   const router = Router();
 
-  // Admin routes
+  // Admin route
   router.get("/", authenticate, userController.getAllUsers);
 
   router.get(
