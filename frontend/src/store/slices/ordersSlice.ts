@@ -36,9 +36,16 @@ export const fetchOrders = createAsyncThunk(
 
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
-  async (data: Omit<CreateOrderDTO, "userEmail">, { rejectWithValue }) => {
+  async (
+    data: Omit<CreateOrderDTO, "userEmail">,
+    { getState, rejectWithValue }
+  ) => {
     try {
-      const response = await orderService.createOrder(data);
+      const state = getState() as RootState;
+      const userEmail = state.user.user?.email;
+      if (!userEmail) throw new Error("User email not found");
+
+      const response = await orderService.createOrder({ ...data, userEmail });
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to create order");

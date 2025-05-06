@@ -7,7 +7,7 @@ import { setupUploadsDirectory } from "./utils/setup-uploads";
 const app = createApp();
 const PORT = config.port || 4002;
 
-// Create uploads director
+// Create uploads directory
 setupUploadsDirectory();
 
 app.listen(PORT, () => {

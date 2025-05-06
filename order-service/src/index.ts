@@ -50,7 +50,7 @@ Container.set(
   new OrderService(Container.get("orderRepository"))
 );
 
-// Get controller instance from container
+// Get controller instance from containe
 const orderController = Container.get(OrderController);
 
 // Mount routes
