@@ -1,0 +1,35 @@
+{
+  "name": "order-service",
+  "version": "1.0.0",
+  "description": "Order Service for E-commerce Platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@types/amqplib": "^0.10.7",
+    "amqplib": "^0.10.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "joi": "^17.9.1",
+    "mongoose": "^7.0.3",
+    "morgan": "^1.10.0",
+    "reflect-metadata": "^0.1.13",
+    "routing-controllers": "^0.10.4",
+    "typedi": "^0.10.0",
+    "typescript": "^5.0.4",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/joi": "^17.2.3",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^18.15.11",
+    "ts-node": "^10.9.1"
+  }
+}

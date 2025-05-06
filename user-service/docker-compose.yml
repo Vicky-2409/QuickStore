@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  user-service:
+    build: .
+    ports:
+      - "4005:4005"
+    environment:
+      - PORT=4005
+      - MONGO_URI=mongodb+srv://svignesh2409:GOgxz3UEBjCrSNtl@cluster0.hchjyx3.mongodb.net/quick-store-user-service
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+      - EXCHANGE_NAME=user-registration
+      - QUEUE_NAME=user.created.queue
+    depends_on:
+      - mongo
+      - rabbitmq
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+volumes:
+  mongo-data:
+  rabbitmq-data:

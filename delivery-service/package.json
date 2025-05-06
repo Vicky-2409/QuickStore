@@ -1,0 +1,38 @@
+{
+  "name": "delivery-service",
+  "version": "1.0.0",
+  "description": "Delivery Service for managing delivery partners and order assignments",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "amqplib": "^0.10.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^7.5.0",
+    "morgan": "^1.10.0",
+    "reflect-metadata": "^0.1.13",
+    "routing-controllers": "^0.11.2",
+    "socket.io": "^4.7.2",
+    "typedi": "^0.10.0",
+    "typescript": "^5.2.2",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^20.5.0",
+    "@types/winston": "^2.4.4",
+    "nodemon": "^3.0.1",
+    "ts-node": "^10.9.1"
+  }
+}
