@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "auth-service-srv/api/auth",
+  baseURL: "http://auth-service-srv:4000/api/auth",
   headers: {
     "Content-Type": "application/json",
   },

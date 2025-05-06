@@ -49,7 +49,7 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "frontend-srv",
+    origin: process.env.FRONTEND_URL || "http://frontend-srv:3000",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: [
