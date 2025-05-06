@@ -15,6 +15,7 @@ spec:
       containers:
         - name: api-gateway
           image: svignesh2409/quick-store-api-gateway
+          imagePullPolicy: Always
           ports:
             - containerPort: 3001
           envFrom:
