@@ -21,7 +21,7 @@ export default function Home() {
     }
   };
 
-  // Card data for each user typ
+  // Card data for each user type
   const userTypes = [
     {
       type: "customer",
