@@ -54,7 +54,7 @@ Container.set(
 const orderController = Container.get(OrderController);
 
 // Mount routes
-app.use("/api/orders", orderRoutes(orderController));
+app.use("/orders", orderRoutes(orderController));
 
 // RabbitMQ setup
 let channel: Channel;
