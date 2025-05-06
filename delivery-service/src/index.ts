@@ -34,9 +34,18 @@ const httpServer = createServer(app);
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
-  methods: ["GET", "POST"],
-  credentials: true,
+  origin: "*", // This allows all origins to make requests
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"], // You can customize methods as needed
+  credentials: true, // Allow credentials (cookies, headers, etc.)
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization",
+    "X-User-Email",
+    "X-User-Id",
+    "X-User-Role",
+    "x-user-email",
+    "x-partner-email",
+  ],
 };
 
 app.use(morgan("dev"));
@@ -51,12 +60,12 @@ const io = new Server(httpServer, {
 // Initialize services
 const socketService = new SocketService(io);
 const orderConsumer = new RabbitMQConsumer(
-  process.env.RABBITMQ_URL || "amqp://localhost",
+  process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672",
   "orders",
   "delivery-service-order-queue"
 );
 const authConsumer = new AuthServiceConsumer(
-  process.env.RABBITMQ_URL || "amqp://localhost"
+  process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672"
 );
 
 orderConsumer.setSocketService(socketService);

@@ -4,7 +4,7 @@ dotenv.config();
 
 export const config = {
   port: process.env.PORT || 4005,
-  nodeEnv: process.env.NODE_ENV || "development",
+  nodeEnv: process.env.NODE_ENV ,
 
   mongodb: {
     uri:
@@ -13,7 +13,7 @@ export const config = {
   },
 
   rabbitmq: {
-    url: process.env.RABBITMQ_URL || "",
+    url: process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672",
     queuePrefix: process.env.RABBITMQ_QUEUE_PREFIX || "delivery",
   },
 

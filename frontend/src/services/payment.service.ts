@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getValidAccessToken } from "@/utils/auth";
 
-const API_GATEWAY_URL = "http://localhost:3001";
+const API_GATEWAY_URL = "api-gateway-srv";
 
 export interface PaymentResponse {
   id: string;

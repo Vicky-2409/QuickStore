@@ -3,12 +3,12 @@ import { Request, Response } from "express";
 
 // Default service URLs
 const DEFAULT_SERVICE_URLS = {
-  AUTH: "http://localhost:4000",
-  USER: "http://localhost:4001",
-  PRODUCT: "http://localhost:4002",
-  ORDER: "http://localhost:4003",
-  PAYMENT: "http://localhost:4004",
-  DELIVERY: "http://localhost:4005",
+  AUTH: "auth-service-srv",
+  USER: "user-service-srv",
+  PRODUCT: "products-service-srv",
+  ORDER: "order-service-srv",
+  PAYMENT: "payment-service-srv",
+  DELIVERY: "delivery-service-srv",
 };
 
 declare global {

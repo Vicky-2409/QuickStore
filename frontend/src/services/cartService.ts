@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import { getAccessToken } from "@/utils/auth";
 import { Product } from "@/types/product";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
 
 // Create an axios instance with default config
 const apiClient = axios.create({

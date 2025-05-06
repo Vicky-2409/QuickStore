@@ -31,7 +31,7 @@ export class RabbitMQConsumer {
   private isConnecting = false;
 
   constructor(
-    private readonly url: string = "amqp://localhost",
+    private readonly url: string = "amqp://rabbitmq-service:5672",
     private readonly exchangeName: string = "user-registration",
     private readonly queueName: string = "profile.updated.queue"
   ) {

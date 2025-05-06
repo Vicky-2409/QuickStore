@@ -11,7 +11,7 @@ export class RabbitMQMessageService implements IMessageService {
     try {
       // Connecting to RabbitMQ server
       const conn = await amqp.connect(
-        process.env.RABBITMQ_URL || "amqp://localhost"
+        process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672"
       );
       this.connection = conn as unknown as amqp.Connection;
       this.channel = await conn.createChannel();

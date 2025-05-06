@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery-service
+  template:
+    metadata:
+      labels:
+        app: delivery-service
+    spec:
+      containers:
+        - name: delivery-service
+          image: svignesh2409/quick-store-delivery-service
+          ports:
+            - containerPort: 4005
+          envFrom:
+            - configMapRef:
+                name: delivery-service-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery-service-srv
+spec:
+  selector:
+    app: delivery-service
+  ports:
+    - name: delivery-ports
+      protocol: TCP
+      port: 4005
+      targetPort: 4005

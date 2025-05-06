@@ -30,7 +30,7 @@ export class UserService {
   private userRepository: UserRepository;
 
   constructor() {
-    const rabbitMQUrl = process.env.RABBITMQ_URL || "amqp://localhost";
+    const rabbitMQUrl = process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672";
     const exchangeName = process.env.EXCHANGE_NAME || "user-registration";
     this.rabbitMQProducer = new RabbitMQProducer(rabbitMQUrl, exchangeName);
     this.userRepository = new UserRepository();

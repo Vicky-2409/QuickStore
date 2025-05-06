@@ -3,7 +3,7 @@ import axios from "axios";
 import { RootState } from "../../store";
 import { productService } from "@/services/productService";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
 
 export interface Product {
   _id: string;

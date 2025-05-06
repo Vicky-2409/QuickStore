@@ -21,26 +21,25 @@ const requiredEnvVars = [
   "ORDER_SERVICE_URL",
   "PAYMENT_SERVICE_URL",
   "DELIVERY_SERVICE_URL",
+  "FRONTEND_URL",
 ];
 
 const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar]);
 
 if (missingEnvVars.length > 0) {
-  console.warn(
-    `Warning: Missing environment variables: ${missingEnvVars.join(
-      ", "
-    )}. Using default values.`
+  throw new Error(
+    `Missing required environment variables: ${missingEnvVars.join(", ")}`
   );
 }
 
 const app = express();
 const httpServer = createServer(app);
-const port = process.env.PORT || 3001; // Default to 3001 if not specified
+const port = process.env.PORT;
 
 // Socket.IO setup
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: process.env.FRONTEND_URL,
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -50,7 +49,7 @@ const io = new Server(httpServer, {
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: process.env.FRONTEND_URL || "frontend-srv",
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: [
@@ -142,11 +141,11 @@ httpServer.listen(port, () => {
     `[${new Date().toISOString()}] API Gateway running on port ${port}`
   );
   console.log(`[${new Date().toISOString()}] Service URLs:`, {
-    auth: process.env.AUTH_SERVICE_URL || "http://localhost:4000",
-    user: process.env.USER_SERVICE_URL || "http://localhost:4001",
-    product: process.env.PRODUCT_SERVICE_URL || "http://localhost:4002",
-    order: process.env.ORDER_SERVICE_URL || "http://localhost:4003",
-    payment: process.env.PAYMENT_SERVICE_URL || "http://localhost:4004",
-    delivery: process.env.DELIVERY_SERVICE_URL || "http://localhost:4005",
+    auth: process.env.AUTH_SERVICE_URL,
+    user: process.env.USER_SERVICE_URL,
+    product: process.env.PRODUCT_SERVICE_URL,
+    order: process.env.ORDER_SERVICE_URL,
+    payment: process.env.PAYMENT_SERVICE_URL,
+    delivery: process.env.DELIVERY_SERVICE_URL,
   });
 });

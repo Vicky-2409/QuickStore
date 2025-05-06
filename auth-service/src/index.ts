@@ -18,7 +18,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 // RabbitMQ Configuration
-const rabbitMQUrl = process.env.RABBITMQ_URL || "";
+const rabbitMQUrl = process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672";
 const exchangeName = process.env.EXCHANGE_NAME || "user-registration";
 
 // Middleware

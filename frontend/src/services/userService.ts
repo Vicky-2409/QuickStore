@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken } from "@/utils/auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
 
 export class UserService {
   static async login(email: string, password: string, role: string) {

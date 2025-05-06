@@ -23,7 +23,7 @@ export class App {
   constructor() {
     this.app = express();
     this.rabbitMQConsumer = new RabbitMQConsumer(
-      process.env.RABBITMQ_URL || "amqp://localhost",
+      process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672",
       process.env.EXCHANGE_NAME || "user-registration",
       process.env.QUEUE_NAME || "user.created.queue"
     );

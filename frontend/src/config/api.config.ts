@@ -1,6 +1,6 @@
 export const API_CONFIG = {
   GATEWAY: {
-    BASE_URL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
+    BASE_URL: process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv",
     ENDPOINTS: {
       // Auth endpoints
       AUTH: {

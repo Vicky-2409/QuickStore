@@ -6,7 +6,7 @@ import { apiClient } from "@/lib/api-client";
 import axios from "axios";
 import { getAccessToken } from "@/utils";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
 
 // Add request interceptor to add auth token
 apiClient.interceptors.request.use((config) => {

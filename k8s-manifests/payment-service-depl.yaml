@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: payment-service
+  template:
+    metadata:
+      labels:
+        app: payment-service
+    spec:
+      containers:
+        - name: payment-service
+          image: svignesh2409/quick-store-payment-service
+          ports:
+            - containerPort: 4004
+          envFrom:
+            - configMapRef:
+                name: payment-service-env
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service-srv
+spec:
+  selector:
+    app: payment-service
+  ports:
+    - name: payment-ports
+      protocol: TCP
+      port: 4004
+      targetPort: 4004
