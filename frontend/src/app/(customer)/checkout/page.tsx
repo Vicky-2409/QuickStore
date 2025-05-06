@@ -178,7 +178,7 @@ export default function CheckoutPage() {
 
       // Initialize Razorpay
       console.log("Initializing Razorpay with options:", {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
         amount: payment.amount,
         currency: "INR",
         name: "Your Store Name",
@@ -186,10 +186,10 @@ export default function CheckoutPage() {
         order_id: payment.razorpayOrderId,
       });
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
         amount: payment.amount,
         currency: "INR",
-        name: "Your Store Name",
+        name: "Quick Shop",
         description: "Order Payment",
         order_id: payment.razorpayOrderId,
         handler: async (response: any) => {
