@@ -27,7 +27,7 @@ declare global {
 export const servicesConfig = {
   auth: {
     target: process.env.AUTH_SERVICE_URL || DEFAULT_SERVICE_URLS.AUTH,
-    pathRewrite: { },
+    pathRewrite: {},
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -59,7 +59,7 @@ export const servicesConfig = {
   },
   users: {
     target: process.env.USER_SERVICE_URL || DEFAULT_SERVICE_URLS.USER,
-    pathRewrite: { },
+    pathRewrite: {},
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -101,8 +101,8 @@ export const servicesConfig = {
     onProxyReq: (proxyReq: any, req: Request, res: Response) => {
       // Forward the user information from the JWT token
       if (req.user) {
-        proxyReq.setHeader("X-User-Email", req.user.email);
-        proxyReq.setHeader("X-User-Role", req.user.role);
+        proxyReq.setHeader("x-user-email", req.user.email);
+        proxyReq.setHeader("x-user-role", req.user.role);
       }
 
       // Log the request
@@ -127,10 +127,14 @@ export const servicesConfig = {
         message: "Failed to connect to order service. Please try again later.",
       });
     },
+    onProxyRes: (proxyRes: any, req: Request, res: Response) => {
+      // Forward the status code and response from the order service
+      res.status(proxyRes.statusCode);
+    },
   },
   payments: {
     target: process.env.PAYMENT_SERVICE_URL || DEFAULT_SERVICE_URLS.PAYMENT,
-    pathRewrite: { },
+    pathRewrite: {},
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -159,7 +163,7 @@ export const servicesConfig = {
   },
   delivery: {
     target: process.env.DELIVERY_SERVICE_URL || DEFAULT_SERVICE_URLS.DELIVERY,
-    pathRewrite: { },
+    pathRewrite: {},
     changeOrigin: true,
     logLevel: "debug",
     secure: false,

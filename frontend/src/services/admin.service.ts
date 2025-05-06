@@ -446,9 +446,14 @@ export class AdminService {
         const payload = JSON.parse(atob(token.split(".")[1]));
         userEmail = payload.email;
         userRole = payload.role;
+
+        // Verify admin role
+        if (userRole !== "admin") {
+          throw new Error("Unauthorized: Admin access required");
+        }
       } catch (error) {
         console.error("Error getting user data from token:", error);
-        throw new Error("Invalid token format");
+        throw new Error("Invalid token format or unauthorized");
       }
 
       return {

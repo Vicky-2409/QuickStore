@@ -23,7 +23,16 @@ import { orderService } from "@/services/order.service";
 import { paymentService } from "@/services/payment.service";
 import { cartService } from "@/services/cartService";
 import { toast } from "react-hot-toast";
-import { MapPin, ShoppingBag, CreditCard, Package, Check, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import {
+  MapPin,
+  ShoppingBag,
+  CreditCard,
+  Package,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+} from "lucide-react";
 
 interface Address {
   id?: string;
@@ -147,6 +156,7 @@ export default function CheckoutPage() {
           zipCode: selectedAddress.zipCode,
           country: selectedAddress.country,
         },
+        userEmail: user.email,
       });
       console.log("Order created:", order);
 
@@ -262,8 +272,8 @@ export default function CheckoutPage() {
       <div className="mb-10">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
-            <button 
-              onClick={() => router.push('/cart')}
+            <button
+              onClick={() => router.push("/cart")}
               className="text-gray-500 hover:text-emerald-500 transition-colors flex items-center space-x-1"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -275,7 +285,7 @@ export default function CheckoutPage() {
             <h1 className="text-2xl font-bold text-gray-900">Checkout</h1>
           </div>
         </div>
-        
+
         {/* Checkout Steps */}
         <div className="flex justify-center">
           <div className="relative w-full max-w-2xl">
@@ -317,7 +327,9 @@ export default function CheckoutPage() {
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <MapPin className="h-5 w-5 text-emerald-500" />
-                <h2 className="text-lg font-semibold text-gray-900">Shipping Address</h2>
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Shipping Address
+                </h2>
               </div>
               {!isAddingAddress && (
                 <button
@@ -348,8 +360,8 @@ export default function CheckoutPage() {
                         },
                       ]}
                     >
-                      <input 
-                        placeholder="Enter street address" 
+                      <input
+                        placeholder="Enter street address"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
                       />
                     </Form.Item>
@@ -358,8 +370,8 @@ export default function CheckoutPage() {
                       label="City"
                       rules={[{ required: true, message: "Please enter city" }]}
                     >
-                      <input 
-                        placeholder="Enter city" 
+                      <input
+                        placeholder="Enter city"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
                       />
                     </Form.Item>
@@ -368,10 +380,12 @@ export default function CheckoutPage() {
                     <Form.Item
                       name="state"
                       label="State"
-                      rules={[{ required: true, message: "Please enter state" }]}
+                      rules={[
+                        { required: true, message: "Please enter state" },
+                      ]}
                     >
-                      <input 
-                        placeholder="Enter state" 
+                      <input
+                        placeholder="Enter state"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
                       />
                     </Form.Item>
@@ -382,8 +396,8 @@ export default function CheckoutPage() {
                         { required: true, message: "Please enter ZIP code" },
                       ]}
                     >
-                      <input 
-                        placeholder="Enter ZIP code" 
+                      <input
+                        placeholder="Enter ZIP code"
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
                       />
                     </Form.Item>
@@ -395,8 +409,8 @@ export default function CheckoutPage() {
                       { required: true, message: "Please enter country" },
                     ]}
                   >
-                    <input 
-                      placeholder="Enter country" 
+                    <input
+                      placeholder="Enter country"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-colors"
                     />
                   </Form.Item>
@@ -445,16 +459,20 @@ export default function CheckoutPage() {
                         >
                           <div className="flex justify-between items-start mb-1">
                             <div className="flex space-x-2 items-center">
-                              <MapPin className={`h-4 w-4 ${
+                              <MapPin
+                                className={`h-4 w-4 ${
                                   selectedAddress?._id === address._id ||
                                   selectedAddress?.id === address.id
                                     ? "text-emerald-500"
                                     : "text-gray-400"
-                                }`} 
+                                }`}
                               />
-                              <p className="font-medium text-gray-900">{address.street}</p>
+                              <p className="font-medium text-gray-900">
+                                {address.street}
+                              </p>
                             </div>
-                            {(selectedAddress?._id === address._id || selectedAddress?.id === address.id) && (
+                            {(selectedAddress?._id === address._id ||
+                              selectedAddress?.id === address.id) && (
                               <div className="bg-emerald-500 text-white p-1 rounded-full">
                                 <Check className="h-3 w-3" />
                               </div>
@@ -486,27 +504,36 @@ export default function CheckoutPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden sticky top-8">
             <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center space-x-2">
               <ShoppingBag className="h-5 w-5 text-emerald-500" />
-              <h2 className="text-lg font-semibold text-gray-900">Order Summary</h2>
+              <h2 className="text-lg font-semibold text-gray-900">
+                Order Summary
+              </h2>
             </div>
             <div className="p-6">
               <div className="space-y-4">
                 {/* Items */}
                 <div className="space-y-3">
                   {items.map((item: any) => (
-                    <div key={item.product._id} className="flex items-center justify-between pb-3 border-b border-gray-100">
+                    <div
+                      key={item.product._id}
+                      className="flex items-center justify-between pb-3 border-b border-gray-100"
+                    >
                       <div className="flex items-center space-x-3">
                         {item.product.imageUrl && (
                           <div className="w-12 h-12 rounded-md border border-gray-200 overflow-hidden">
-                            <img 
-                              src={item.product.imageUrl} 
-                              alt={item.product.name} 
+                            <img
+                              src={item.product.imageUrl}
+                              alt={item.product.name}
                               className="w-full h-full object-cover"
                             />
                           </div>
                         )}
                         <div>
-                          <p className="font-medium text-gray-900">{item.product.name}</p>
-                          <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                          <p className="font-medium text-gray-900">
+                            {item.product.name}
+                          </p>
+                          <p className="text-sm text-gray-500">
+                            Qty: {item.quantity}
+                          </p>
                         </div>
                       </div>
                       <span className="font-medium text-gray-900">
@@ -515,7 +542,7 @@ export default function CheckoutPage() {
                     </div>
                   ))}
                 </div>
-                
+
                 {/* Pricing */}
                 <div className="space-y-2 py-2">
                   <div className="flex justify-between text-gray-600">
@@ -531,7 +558,7 @@ export default function CheckoutPage() {
                     <span>Calculated at checkout</span>
                   </div>
                 </div>
-                
+
                 {/* Total */}
                 <div className="border-t border-gray-100 pt-4 mt-4">
                   <div className="flex justify-between text-lg font-semibold text-gray-900">
@@ -539,13 +566,14 @@ export default function CheckoutPage() {
                     <span>${total.toFixed(2)}</span>
                   </div>
                 </div>
-                
+
                 {/* Pay Button */}
                 <button
                   className={`w-full py-3 font-medium rounded-lg transition-colors shadow-sm flex items-center justify-center space-x-2 mt-6
-                    ${loading || !selectedAddress || items.length === 0
-                      ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : "bg-emerald-500 text-white hover:bg-emerald-600"
+                    ${
+                      loading || !selectedAddress || items.length === 0
+                        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "bg-emerald-500 text-white hover:bg-emerald-600"
                     }`}
                   onClick={handlePayment}
                   disabled={loading || !selectedAddress || items.length === 0}
@@ -553,7 +581,7 @@ export default function CheckoutPage() {
                   <CreditCard className="h-5 w-5" />
                   <span>{loading ? "Processing..." : "Pay Now"}</span>
                 </button>
-                
+
                 {/* Warning States */}
                 {!selectedAddress && (
                   <p className="text-sm text-amber-600 flex items-center justify-center mt-2">
@@ -567,7 +595,7 @@ export default function CheckoutPage() {
                     Your cart is empty
                   </p>
                 )}
-                
+
                 {/* Security Notice */}
                 <div className="text-xs text-gray-500 mt-4 flex items-center justify-center">
                   <CreditCard className="h-3 w-3 mr-1" />

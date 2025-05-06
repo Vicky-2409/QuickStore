@@ -73,48 +73,14 @@ export class OrderService {
     }
   }
 
-  async createOrder(data: Omit<CreateOrderDTO, "userEmail">): Promise<Order> {
+  async createOrder(data: CreateOrderDTO): Promise<Order> {
     try {
-      const token = await getValidAccessToken();
-      if (!token) {
-        throw new Error("No auth token found");
-      }
-
-      // Decode the token to get user email
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      const userEmail = payload.email;
-
-      // Log detailed item structure
-      console.log(
-        "Items structure check:",
-        data.items.map((item) => ({
-          product: {
-            hasId: !!item.product._id,
-            hasName: !!item.product.name,
-            hasPrice: typeof item.product.price === "number",
-            hasImageUrl: "imageUrl" in item.product,
-            fields: Object.keys(item.product),
-          },
-          hasQuantity: typeof item.quantity === "number",
-          quantity: item.quantity,
-        }))
-      );
-
-      const requestData = { ...data, userEmail };
-      console.log("Creating order with data:", requestData);
-
-      const response = await axios.post(`${API_URL}/api/orders`, requestData, {
+      const response = await axios.post(`${API_URL}/api/orders`, data, {
         headers: await this.getAuthHeaders(),
       });
-      console.log("Order creation response:", response.data);
       return response.data.order;
-    } catch (error: any) {
-      console.error("Error creating order:", {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        requestData: data,
-      });
+    } catch (error) {
+      console.error("Error creating order:", error);
       throw error;
     }
   }

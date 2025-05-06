@@ -27,6 +27,9 @@ export const createProxyRoutes = (): Router => {
   // Order service routes (public for creation, protected for other operations)
   const orderProxy = createProxy(servicesConfig.orders);
   router.post("/api/orders", orderProxy); // Allow POST without auth
+  router.get("/api/orders", authenticate, orderProxy); // Protect GET all orders
+  router.get("/api/orders/:orderId", authenticate, orderProxy); // Protect GET single order
+  router.put("/api/orders/:orderId/status", authenticate, orderProxy); // Protect status updates
   router.use("/api/orders", authenticate, orderProxy); // Protect other operations
 
   // Protected routes

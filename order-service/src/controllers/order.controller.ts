@@ -168,31 +168,24 @@ export class OrderController {
 
       const order = await this.orderService.getOrderById(orderId);
 
-      // Allow delivery partners to access any order
-      if (userRole === "delivery_partner") {
+      // Allow access if user is admin, delivery partner, or the order owner
+      if (
+        userRole === "admin" ||
+        userRole === "delivery_partner" ||
+        order.userEmail === userEmail
+      ) {
         return res.json({ success: true, order });
       }
 
-      // For regular users, check if the order belongs to them
-      if (order.userEmail !== userEmail) {
-        return res.status(403).json({
-          success: false,
-          message: "You don't have permission to access this order",
-        });
-      }
-
-      return res.json({ success: true, order });
-    } catch (error: any) {
-      console.error("Error fetching order:", error);
-      if (error.message === "Order not found") {
-        return res.status(404).json({
-          success: false,
-          message: "Order not found",
-        });
-      }
+      return res.status(403).json({
+        success: false,
+        message: "You don't have permission to access this order",
+      });
+    } catch (error) {
+      console.error("Error in getOrderById:", error);
       return res.status(500).json({
         success: false,
-        message: "Failed to fetch order",
+        message: "Error fetching order",
       });
     }
   }
