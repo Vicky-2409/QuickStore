@@ -26,7 +26,7 @@ declare global {
 export const servicesConfig = {
   auth: {
     target: process.env.AUTH_SERVICE_URL || DEFAULT_SERVICE_URLS.AUTH,
-    pathRewrite: { "^/api/auth": "api/auth" },
+    pathRewrite: { "^/api/auth": "/api/auth" },
     changeOrigin: true,
     logLevel: "debug",
     secure: false,

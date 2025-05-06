@@ -17,7 +17,7 @@ spec:
             pathType: ImplementationSpecific
             backend:
               service:
-                name: cm-acme-http-solver-socialconnect
+                name: cm-acme-http-solver-thestore
                 port:
                   number: 8089
           - path: /socket.io
