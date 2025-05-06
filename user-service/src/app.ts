@@ -13,7 +13,7 @@ import { authenticate } from "./middleware/auth.middleware";
 import { errorHandler } from "./middleware/error.middleware";
 import { requestLogger } from "./middleware/logger.middleware";
 
-// Load environment variables
+// Load environment variable
 dotenv.config();
 
 export class App {

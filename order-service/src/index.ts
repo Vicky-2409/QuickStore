@@ -12,7 +12,7 @@ import { OrderController } from "./controllers/order.controller";
 import morgan from "morgan";
 import { connectRabbitMQ } from "./config/rabbitmq";
 import { Channel, Message } from "amqplib";
-// Load environment variable
+// Load environment variables
 dotenv.config();
 
 const app = express();

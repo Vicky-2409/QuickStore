@@ -43,7 +43,7 @@ app.use(morgan("dev"));
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Initialize Socket.IO serve
+// Initialize Socket.IO server
 const io = new Server(httpServer, {
   cors: corsOptions,
 });
