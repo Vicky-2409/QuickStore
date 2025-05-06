@@ -2,13 +2,14 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import { Request, Response } from "express";
 
 // Default service URLs
+
 const DEFAULT_SERVICE_URLS = {
-  AUTH: "auth-service-srv",
-  USER: "user-service-srv",
-  PRODUCT: "products-service-srv",
-  ORDER: "order-service-srv",
-  PAYMENT: "payment-service-srv",
-  DELIVERY: "delivery-service-srv",
+  AUTH: "http://auth-service-srv:4000",
+  USER: "http://user-service-srv:4001",
+  PRODUCT: "http://products-service-srv:4002",
+  ORDER: "http://order-service-srv:4003",
+  PAYMENT: "http://payment-service-srv:4004",
+  DELIVERY: "http://delivery-service-srv:4005",
 };
 
 declare global {
