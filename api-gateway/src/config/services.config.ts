@@ -27,7 +27,7 @@ declare global {
 export const servicesConfig = {
   auth: {
     target: process.env.AUTH_SERVICE_URL || DEFAULT_SERVICE_URLS.AUTH,
-    pathRewrite: {},
+    pathRewrite: { },
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -59,7 +59,7 @@ export const servicesConfig = {
   },
   users: {
     target: process.env.USER_SERVICE_URL || DEFAULT_SERVICE_URLS.USER,
-    pathRewrite: { "^/api/users": "/api/users" },
+    pathRewrite: { },
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -85,10 +85,7 @@ export const servicesConfig = {
   },
   products: {
     target: process.env.PRODUCT_SERVICE_URL || DEFAULT_SERVICE_URLS.PRODUCT,
-    pathRewrite: {
-      "^/api/products": "/api/products",
-      "^/api/categories": "/api/categories",
-    },
+    pathRewrite: {},
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -96,7 +93,7 @@ export const servicesConfig = {
   },
   orders: {
     target: process.env.ORDER_SERVICE_URL || DEFAULT_SERVICE_URLS.ORDER,
-    pathRewrite: { "^/api/orders": "/api/orders" },
+    pathRewrite: {},
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -133,7 +130,7 @@ export const servicesConfig = {
   },
   payments: {
     target: process.env.PAYMENT_SERVICE_URL || DEFAULT_SERVICE_URLS.PAYMENT,
-    pathRewrite: { "^/api/payments": "/api/payments" },
+    pathRewrite: { },
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
@@ -162,7 +159,7 @@ export const servicesConfig = {
   },
   delivery: {
     target: process.env.DELIVERY_SERVICE_URL || DEFAULT_SERVICE_URLS.DELIVERY,
-    pathRewrite: { "^/api/delivery": "/api/delivery" },
+    pathRewrite: { },
     changeOrigin: true,
     logLevel: "debug",
     secure: false,
