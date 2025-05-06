@@ -18,14 +18,18 @@ export const useDeliverySocket = ({
 
   useEffect(() => {
     if (!userEmail) {
-      console.log("[Socket] No user email provided, skipping delivery socket connection");
+      console.log(
+        "[Socket] No user email provided, skipping delivery socket connection"
+      );
       return;
     }
 
-    console.log(`[Socket] Initializing delivery socket connection for (${userEmail})`);
+    console.log(
+      `[Socket] Initializing delivery socket connection for (${userEmail})`
+    );
 
     const socket = io(
-      process.env.NEXT_PUBLIC_API_GATEWAY_URL || "api-gateway-srv",
+      process.env.NEXT_PUBLIC_API_GATEWAY_URL || "https://thestore.pw",
       {
         path: "/socket.io",
         withCredentials: true,
@@ -37,34 +41,51 @@ export const useDeliverySocket = ({
     );
 
     socket.on("connect", () => {
-      console.log(`[Socket] Delivery socket connected successfully for (${userEmail})`);
+      console.log(
+        `[Socket] Delivery socket connected successfully for (${userEmail})`
+      );
       setIsConnected(true);
       socket.emit("delivery_partner_connected", { email: userEmail });
     });
 
     socket.on("disconnect", (reason) => {
-      console.log(`[Socket] Delivery socket disconnected for (${userEmail}). Reason:`, reason);
+      console.log(
+        `[Socket] Delivery socket disconnected for (${userEmail}). Reason:`,
+        reason
+      );
       setIsConnected(false);
     });
 
     socket.on("connect_error", (error) => {
-      console.error(`[Socket] Delivery socket connection error for (${userEmail}):`, error);
+      console.error(
+        `[Socket] Delivery socket connection error for (${userEmail}):`,
+        error
+      );
     });
 
     socket.on("reconnect", (attemptNumber) => {
-      console.log(`[Socket] Delivery socket reconnected after ${attemptNumber} attempts for (${userEmail})`);
+      console.log(
+        `[Socket] Delivery socket reconnected after ${attemptNumber} attempts for (${userEmail})`
+      );
     });
 
     socket.on("reconnect_attempt", (attemptNumber) => {
-      console.log(`[Socket] Attempting to reconnect delivery socket (${attemptNumber}) for (${userEmail})`);
+      console.log(
+        `[Socket] Attempting to reconnect delivery socket (${attemptNumber}) for (${userEmail})`
+      );
     });
 
     socket.on("reconnect_error", (error) => {
-      console.error(`[Socket] Delivery socket reconnection error for (${userEmail}):`, error);
+      console.error(
+        `[Socket] Delivery socket reconnection error for (${userEmail}):`,
+        error
+      );
     });
 
     socket.on("reconnect_failed", () => {
-      console.error(`[Socket] Delivery socket reconnection failed for (${userEmail})`);
+      console.error(
+        `[Socket] Delivery socket reconnection failed for (${userEmail})`
+      );
     });
 
     // Listen for new orders that need delivery
@@ -75,14 +96,18 @@ export const useDeliverySocket = ({
 
     // Listen for orders that have been taken by other delivery partners
     socket.on("order_taken_by_partner", (data: { orderId: string }) => {
-      console.log(`[Socket] Order ${data.orderId} taken by another delivery partner`);
+      console.log(
+        `[Socket] Order ${data.orderId} taken by another delivery partner`
+      );
       onOrderTaken(data.orderId);
     });
 
     setSocket(socket);
 
     return () => {
-      console.log(`[Socket] Cleaning up delivery socket connection for (${userEmail})`);
+      console.log(
+        `[Socket] Cleaning up delivery socket connection for (${userEmail})`
+      );
       socket.disconnect();
     };
   }, [userEmail, onNewOrder, onOrderTaken]);

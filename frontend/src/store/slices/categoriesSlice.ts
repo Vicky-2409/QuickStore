@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { RootState } from "../../store";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://thestore.pw";
 
 export interface Category {
   _id: string;

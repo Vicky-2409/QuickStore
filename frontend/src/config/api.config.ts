@@ -1,6 +1,6 @@
 export const API_CONFIG = {
   GATEWAY: {
-    BASE_URL: process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv",
+    BASE_URL: process.env.NEXT_PUBLIC_API_URL || "https://thestore.pw",
     ENDPOINTS: {
       // Auth endpoints
       AUTH: {

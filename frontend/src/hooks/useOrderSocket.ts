@@ -29,7 +29,7 @@ export const useOrderSocket = ({
     );
 
     const socket = io(
-      process.env.NEXT_PUBLIC_API_GATEWAY_URL || "api-gateway-srv",
+      process.env.NEXT_PUBLIC_API_GATEWAY_URL || "https://thestore.pw",
       {
         path: "/socket.io",
         withCredentials: true,

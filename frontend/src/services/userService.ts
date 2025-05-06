@@ -1,7 +1,7 @@
 import axios from "axios";
 import { getAccessToken } from "@/utils/auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://thestore.pw";
 
 export class UserService {
   static async login(email: string, password: string, role: string) {

@@ -10,7 +10,7 @@ import { IPayment } from "../models/payment.model";
 dotenv.config();
 
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
-const API_GATEWAY_URL = process.env.API_GATEWAY_URL || "api-gateway-srv";
+const API_GATEWAY_URL = process.env.API_GATEWAY_URL || "https://thestore.pw";
 
 if (!RAZORPAY_KEY_SECRET) {
   throw new Error("RAZORPAY_KEY_SECRET is not configured in your .env file");

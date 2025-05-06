@@ -44,7 +44,7 @@ export interface LoginResponse {
   };
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://thestore.pw";
 
 export class AuthService {
   async registerDeliveryPartner(data: RegisterData) {

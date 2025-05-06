@@ -2,7 +2,7 @@ import axios from "axios";
 import { getValidAccessToken } from "@/utils/auth";
 import { Order, OrderStatus } from "@/types/order.types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://thestore.pw";
 
 export interface OrderItem {
   product: {
@@ -200,16 +200,16 @@ export class OrderService {
         },
         { headers }
       );
-      
+
       console.log("Assign delivery partner response:", response.data);
-      
+
       if (!response.data || !response.data.orderId) {
         throw new Error("Invalid response from server");
       }
-      
+
       // Get the full order details
-      const orderDetails:any = await this.getOrderById(response.data.orderId);
-      
+      const orderDetails: any = await this.getOrderById(response.data.orderId);
+
       // Restructure the response to match the Order interface
       const order: Order = {
         _id: orderDetails._id,
@@ -221,17 +221,38 @@ export class OrderService {
         customerName: "", // Extract from user details if available
         customerEmail: orderDetails.userEmail || response.data.customerEmail,
         customerAddress: {
-          street: orderDetails.address?.street || response.data.customerAddress?.street || "",
-          city: orderDetails.address?.city || response.data.customerAddress?.city || "",
-          state: orderDetails.address?.state || response.data.customerAddress?.state || "",
-          zipCode: orderDetails.address?.zipCode || response.data.customerAddress?.zipCode || "",
-          country: orderDetails.address?.country || response.data.customerAddress?.country || "",
+          street:
+            orderDetails.address?.street ||
+            response.data.customerAddress?.street ||
+            "",
+          city:
+            orderDetails.address?.city ||
+            response.data.customerAddress?.city ||
+            "",
+          state:
+            orderDetails.address?.state ||
+            response.data.customerAddress?.state ||
+            "",
+          zipCode:
+            orderDetails.address?.zipCode ||
+            response.data.customerAddress?.zipCode ||
+            "",
+          country:
+            orderDetails.address?.country ||
+            response.data.customerAddress?.country ||
+            "",
         },
         assignedPartnerId: response.data.assignedPartnerId || partnerId,
-        createdAt: orderDetails.createdAt || response.data.createdAt || new Date().toISOString(),
-        updatedAt: orderDetails.updatedAt || response.data.updatedAt || new Date().toISOString(),
+        createdAt:
+          orderDetails.createdAt ||
+          response.data.createdAt ||
+          new Date().toISOString(),
+        updatedAt:
+          orderDetails.updatedAt ||
+          response.data.updatedAt ||
+          new Date().toISOString(),
       };
-      
+
       console.log("Order assigned to delivery partner:", order);
       return order;
     } catch (error) {

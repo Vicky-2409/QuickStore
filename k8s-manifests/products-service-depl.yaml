@@ -15,6 +15,7 @@ spec:
       containers:
         - name: products-service
           image: svignesh2409/quick-store-products-service
+          command: ["node", "dist/server.js"]  # Add this line to specify the correct entry point
           ports:
             - containerPort: 4002
           envFrom:

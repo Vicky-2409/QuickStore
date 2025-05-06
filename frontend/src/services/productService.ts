@@ -4,7 +4,7 @@ import { API_CONFIG } from "@/config/api.config";
 import apiClient from "@/lib/api-client";
 import axios from "axios";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "api-gateway-srv";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://thestore.pw";
 
 export const productService = {
   getProducts: async (page: number = 1, limit: number = 12) => {

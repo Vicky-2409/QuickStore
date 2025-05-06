@@ -13,6 +13,13 @@ spec:
     - host: thestore.pw
       http:
         paths:
+          - path: /.well-known/acme-challenge/
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: cm-acme-http-solver-socialconnect
+                port:
+                  number: 8089
           - path: /socket.io
             pathType: ImplementationSpecific
             backend:
