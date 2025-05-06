@@ -12,4 +12,4 @@ RUN npm run build
 
 EXPOSE 4002
 
-CMD ["node", "dist/src/server.js"]
+CMD ["node", "dist/server.js"]
