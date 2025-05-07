@@ -37,7 +37,7 @@ app.use(express.json());
 // Register dependencies
 Container.set("paymentRepository", new PaymentRepository());
 
-// Setup routing-controllers
+// Setup routing-controller
 useExpressServer(app, {
   controllers: [PaymentController],
   defaultErrorHandler: false,

@@ -149,10 +149,18 @@ export class OrderService {
   }
 
   async getPendingOrders(): Promise<Order[]> {
-    const response = await axios.get(`${API_URL}/api/delivery/order/pending`, {
-      headers: await this.getAuthHeaders(),
-    });
-    return response.data;
+    try {
+      const response = await axios.get(
+        `${API_URL}/api/delivery/order/pending`,
+        {
+          headers: await this.getAuthHeaders(),
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching pending orders:", error);
+      throw error;
+    }
   }
 
   async assignDeliveryPartner(
@@ -230,40 +238,18 @@ export class OrderService {
     }
   }
 
-  async getActiveOrder(partnerEmail: string): Promise<Order | null> {
+  async getActiveOrder(email: string): Promise<Order> {
     try {
-      console.log("Fetching active order for partner:", partnerEmail);
       const response = await axios.get(`${API_URL}/api/delivery/order/active`, {
         headers: {
           ...(await this.getAuthHeaders()),
-          "x-partner-email": partnerEmail,
+          "x-user-email": email,
         },
       });
-      console.log("Active order API response:", response.data);
-
-      // If we have an active order, fetch its complete details
-      if (response.data.order) {
-        console.log(
-          "Fetching complete order details for:",
-          response.data.order.orderId
-        );
-        const orderDetails = await this.getOrderById(
-          response.data.order.orderId
-        );
-        console.log("Complete order details:", orderDetails);
-
-        const combinedOrder = {
-          ...response.data.order,
-          ...orderDetails,
-        };
-        console.log("Combined order data:", combinedOrder);
-        return combinedOrder;
-      }
-
-      return null;
+      return response.data;
     } catch (error) {
       console.error("Error fetching active order:", error);
-      return null;
+      throw error;
     }
   }
 }

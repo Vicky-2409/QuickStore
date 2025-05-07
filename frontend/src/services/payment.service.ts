@@ -43,8 +43,8 @@ class PaymentService {
   async createPayment(
     amount: number,
     orderId: string,
-    customerEmail: string,
-    customerAddress: {
+    userEmail: string,
+    address: {
       street: string;
       city: string;
       state: string;
@@ -53,44 +53,20 @@ class PaymentService {
     }
   ): Promise<PaymentResponse> {
     try {
-      // Validate required fields
-      if (!amount || !orderId || !customerEmail || !customerAddress) {
-        throw new Error("Missing required fields for payment creation");
-      }
-
-      if (
-        !customerAddress.street ||
-        !customerAddress.city ||
-        !customerAddress.state ||
-        !customerAddress.zipCode ||
-        !customerAddress.country
-      ) {
-        throw new Error("Missing required address fields");
-      }
-
-      console.log("Creating payment with data:", {
-        amount,
-        orderId,
-        customerEmail,
-        customerAddress,
-      });
       const response = await axios.post(
         `${API_GATEWAY_URL}/api/payments/create-order`,
         {
-          amount,
+          amount: amount * 100, // Convert to paise
+          currency: "INR",
           orderId,
-          customerEmail,
-          customerAddress,
+          userEmail,
+          address,
         },
         {
           headers: await this.getAuthHeaders(),
         }
       );
-      console.log("Payment creation response:", response.data);
-      return {
-        ...response.data.order,
-        razorpayOrderId: response.data.order.id,
-      };
+      return response.data;
     } catch (error) {
       console.error("Error creating payment:", error);
       throw error;

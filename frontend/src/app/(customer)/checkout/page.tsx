@@ -165,7 +165,7 @@ export default function CheckoutPage() {
       const payment = await paymentService.createPayment(
         total,
         order._id,
-        user.email, // Get email from Redux store
+        user.email,
         {
           street: selectedAddress.street,
           city: selectedAddress.city,
@@ -178,7 +178,8 @@ export default function CheckoutPage() {
 
       // Initialize Razorpay
       console.log("Initializing Razorpay with options:", {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
+        key:
+          process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
         amount: payment.amount,
         currency: "INR",
         name: "Your Store Name",
@@ -186,7 +187,8 @@ export default function CheckoutPage() {
         order_id: payment.razorpayOrderId,
       });
       const options = {
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
+        key:
+          process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
         amount: payment.amount,
         currency: "INR",
         name: "Quick Shop",

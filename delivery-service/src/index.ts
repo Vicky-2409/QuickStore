@@ -26,7 +26,7 @@ import { OrderRepository } from "./repositories/order.repository";
 import { DeliveryPartnerRepository } from "./repositories/delivery-partner.repository";
 import { createDeliveryRoutes } from "./routes/delivery.routes";
 
-// Load environment variables
+// Load environment variable
 dotenv.config();
 
 const app = express();
@@ -131,7 +131,7 @@ const deliveryController = new DeliveryController(
 );
 app.use("/api/delivery", createDeliveryRoutes(deliveryController));
 
-// Health check endpoint
+// Health check endpoint  
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
 });
