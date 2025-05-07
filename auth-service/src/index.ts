@@ -11,7 +11,7 @@ import { seedAdmin } from "./utils/seed.utils";
 import morgan from "morgan";
 import { RabbitMQConsumer } from "./rabbitmq/consumer";
 
-// Load environment variabless
+// Load environment variables
 dotenv.config();
 
 const app = express();

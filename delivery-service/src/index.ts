@@ -57,7 +57,7 @@ const io = new Server(httpServer, {
   cors: corsOptions,
 });
 
-// Initialize servicess
+// Initialize services
 const socketService = new SocketService(io);
 const orderConsumer = new RabbitMQConsumer(
   process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672",
