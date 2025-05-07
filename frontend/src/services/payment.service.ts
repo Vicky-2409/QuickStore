@@ -59,7 +59,7 @@ class PaymentService {
           amount: amount * 100, // Convert to paise
           currency: "INR",
           orderId,
-          userEmail,
+          customerEmail: userEmail,
           address,
         },
         {

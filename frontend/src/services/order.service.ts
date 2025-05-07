@@ -243,7 +243,7 @@ export class OrderService {
       const response = await axios.get(`${API_URL}/api/delivery/order/active`, {
         headers: {
           ...(await this.getAuthHeaders()),
-          "x-user-email": email,
+          "x-partner-email": email,
         },
       });
       return response.data;

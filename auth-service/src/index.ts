@@ -50,7 +50,7 @@ const authService = new AuthService(userRepository, rabbitMQUrl);
 // Initialize RabbitMQ Consumer
 const rabbitMQConsumer = new RabbitMQConsumer(rabbitMQUrl, exchangeName);
 
-// Initialize controllers
+// Initialize controller
 const authController = new AuthController(authService);
 
 // Routes

@@ -9,7 +9,7 @@ import { IPayment } from "../models/payment.model";
 
 dotenv.config();
 
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || "bhtVpaw0zDw5uCY9ybVGEYRE";
 const API_GATEWAY_URL = process.env.API_GATEWAY_URL || "https://thestore.pw";
 
 if (!RAZORPAY_KEY_SECRET) {
@@ -27,8 +27,8 @@ export class PaymentService {
     @Inject("rabbitChannel") private channel: Channel
   ) {
     this.razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID!,
-      key_secret: process.env.RAZORPAY_KEY_SECRET!,
+      key_id: process.env.RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
+      key_secret: process.env.RAZORPAY_KEY_SECRET || "bhtVpaw0zDw5uCY9ybVGEYRE",
     });
   }
 

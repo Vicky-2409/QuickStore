@@ -120,7 +120,7 @@ const deliveryPartnerService = new DeliveryPartnerService(
   deliveryPartnerRepository
 );
 
-// Register services in container
+// Register services in containers
 Container.set("orderService", orderService);
 Container.set("deliveryPartnerService", deliveryPartnerService);
 
