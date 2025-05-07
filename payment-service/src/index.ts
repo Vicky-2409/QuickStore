@@ -34,7 +34,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Register dependencies
+// Register dependencie
 Container.set("paymentRepository", new PaymentRepository());
 
 // Register PaymentService
