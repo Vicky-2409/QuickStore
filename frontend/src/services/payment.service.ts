@@ -60,7 +60,7 @@ class PaymentService {
           currency: "INR",
           orderId,
           customerEmail: userEmail,
-          address,
+          customerAddress: address,
         },
         {
           headers: await this.getAuthHeaders(),

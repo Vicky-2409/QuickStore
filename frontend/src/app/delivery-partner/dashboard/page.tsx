@@ -151,8 +151,11 @@ export default function DeliveryPartnerDashboard() {
 
         // Fetch current order if any
         try {
-          console.log("Fetching active order for:", currentUser.email);
-          const email = currentUser.email ?? currentUser.data.email;
+          console.log("Current user object:", currentUser);
+          console.log("Current user email:", currentUser.email);
+          console.log("Current user data email:", currentUser.data?.email);
+          const email = currentUser.email ?? currentUser.data?.email;
+          console.log("Final email being used:", email);
           const activeOrder = await orderService.getActiveOrder(email);
           console.log("Active order response:", activeOrder);
 
@@ -243,7 +246,7 @@ export default function DeliveryPartnerDashboard() {
 
       dispatch(setCurrentOrder(order));
       console.log("removeAvailableOrder", order._id);
-      
+
       dispatch(removeAvailableOrder(order._id));
 
       // Emit both events

@@ -52,7 +52,7 @@ mongoose
 // Connect to RabbitMQ and setup subscribers
 async function setupRabbitMQ() {
   try {
-    const connection = await connect(process.env.RABBITMQ_URL!);
+    const connection = await connect(process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672");
     const channel = await connection.createChannel();
 
     // Store RabbitMQ channel in container
