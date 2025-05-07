@@ -54,7 +54,7 @@ useExpressServer(app, {
 
 // Connect to MongoDB
 mongoose
-  .connect(process.env.MONGO_URI!)
+  .connect("mongodb+srv://svignesh2409:GOgxz3UEBjCrSNtl@cluster0.hchjyx3.mongodb.net/quick-store-payment-service")
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("MongoDB connection error:", err));
 

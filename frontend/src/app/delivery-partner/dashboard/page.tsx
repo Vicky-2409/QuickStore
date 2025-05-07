@@ -50,6 +50,7 @@ export default function DeliveryPartnerDashboard() {
   const [disabledStatuses, setDisabledStatuses] = useState<string[]>([]);
   const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
   const [customerError, setCustomerError] = useState<string | null>(null);
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
 
   const handleNewOrder = useCallback(
     async (data: Order) => {
@@ -98,12 +99,12 @@ export default function DeliveryPartnerDashboard() {
     useDeliverySocket({
       onNewOrder: handleNewOrder,
       onOrderTaken: handleOrderTaken,
-      userEmail: user?.email || "",
+      userEmail: isUserLoaded ? user?.email || "" : "",
     });
 
   const { updateOrderStatus } = useOrderSocket({
     onOrderStatusUpdate: handleOrderStatusUpdate,
-    userEmail: user?.email || "",
+    userEmail: isUserLoaded ? user?.email || "" : "",
     role: "delivery_partner",
   });
 
@@ -152,6 +153,7 @@ export default function DeliveryPartnerDashboard() {
         }
 
         setUser(currentUser as User);
+        setIsUserLoaded(true);
         dispatch(setLoading(true));
 
         // Fetch current order if any
@@ -265,85 +267,86 @@ export default function DeliveryPartnerDashboard() {
     orderId: string,
     newStatus: OrderStatus
   ) => {
+    if (!user?.email) {
+      toast.error("User email not found");
+      return;
+    }
+
     try {
       toast.loading("Updating order status...", { id: "updateStatus" });
-      // Update status through API
-      await deliveryService.updateOrderStatus(orderId, newStatus);
 
-      // Emit socket event for real-time update
-      console.log("[Delivery] Emitting order status update:", {
-        orderId,
-        newStatus,
-        userEmail: user?.email,
-      });
-      updateOrderStatus(orderId, newStatus);
+      // Update order status in the backend
+      await orderService.updateOrderStatus(orderId, newStatus);
 
       // Update local state
-      if (currentOrder && currentOrder.orderId === orderId) {
-        dispatch(setCurrentOrder({ ...currentOrder, status: newStatus }));
+      dispatch(
+        setCurrentOrder({
+          ...currentOrder!,
+          status: newStatus,
+        })
+      );
 
-        // Update disabled statuses based on new status
-        if (newStatus === "picked_up") {
-          setDisabledStatuses(["assigned"]);
-        } else if (newStatus === "on_the_way") {
-          setDisabledStatuses(["assigned", "picked_up"]);
-        }
+      // Emit socket event
+      updateOrderStatus(orderId, newStatus);
+
+      // Update disabled statuses
+      if (newStatus === "picked_up") {
+        setDisabledStatuses(["assigned"]);
+      } else if (newStatus === "on_the_way") {
+        setDisabledStatuses(["assigned", "picked_up"]);
       }
 
-      toast.success(`Order status updated to ${newStatus.replace(/_/g, " ")}`, {
+      toast.success("Order status updated successfully", {
         id: "updateStatus",
       });
     } catch (error) {
       console.error("Error updating order status:", error);
-      toast.error("Failed to update order status", { id: "updateStatus" });
+      toast.error("Failed to update order status", {
+        id: "updateStatus",
+      });
     }
   };
 
   const getNextStatus = (currentStatus: OrderStatus): OrderStatus | null => {
-    switch (currentStatus) {
-      case "assigned":
-        return "picked_up";
-      case "picked_up":
-        return "on_the_way";
-      case "on_the_way":
-        return "delivered";
-      default:
-        return null;
-    }
+    if (!currentStatus) return null;
+
+    const statusFlow: Record<OrderStatus, OrderStatus | null> = {
+      pending: "assigned",
+      assigned: "picked_up",
+      picked_up: "on_the_way",
+      on_the_way: "delivered",
+      delivered: null,
+    };
+
+    return statusFlow[currentStatus] || null;
   };
 
   const getStatusBadgeColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-amber-50 text-amber-700 border-amber-200";
-      case "assigned":
-        return "bg-blue-50 text-blue-700 border-blue-200";
-      case "picked_up":
-        return "bg-indigo-50 text-indigo-700 border-indigo-200";
-      case "on_the_way":
-        return "bg-purple-50 text-purple-700 border-purple-200";
-      case "delivered":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200";
-      case "cancelled":
-        return "bg-rose-50 text-rose-700 border-rose-200";
-      default:
-        return "bg-gray-50 text-gray-700 border-gray-200";
-    }
+    if (!status) return "bg-gray-500";
+
+    const colors: Record<string, string> = {
+      pending: "bg-yellow-500",
+      assigned: "bg-blue-500",
+      picked_up: "bg-indigo-500",
+      on_the_way: "bg-purple-500",
+      delivered: "bg-green-500",
+    };
+
+    return colors[status] || "bg-gray-500";
   };
 
   const getProgressPercentage = (status: string) => {
-    switch (status) {
-      case "assigned":
-        return 25;
-      case "picked_up":
-        return 50;
-      case "on_the_way":
-        return 75;
-      case "delivered":
-        return 100;
-      default:
-        return 0;
-    }
+    if (!status) return 0;
+
+    const percentages: Record<string, number> = {
+      pending: 0,
+      assigned: 25,
+      picked_up: 50,
+      on_the_way: 75,
+      delivered: 100,
+    };
+
+    return percentages[status] || 0;
   };
 
   if (isLoading) {
