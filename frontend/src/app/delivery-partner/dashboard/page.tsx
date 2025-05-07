@@ -132,30 +132,23 @@ export default function DeliveryPartnerDashboard() {
         const isAuth = isAuthenticated();
         console.log("isAuth", isAuth);
         if (!isAuth) {
-          console.log("isAuth", isAuth);
           router.push("/delivery-partner/login");
           return;
         }
 
-        let currentUser = getUser();
-        if (currentUser.data) {
-          currentUser = currentUser.data;
-        }
-        console.log("currentUser", currentUser);
-        if (!currentUser) {
-          console.log("currentUser", currentUser);
-          console.log("currentUser.data.role", currentUser.data.role);
+        const currentUser = getUser();
+        console.log("Current user object:", currentUser);
+
+        if (!currentUser || !currentUser.email) {
+          console.log("No user data or email found");
           router.push("/delivery-partner/login");
           return;
         }
 
         if (currentUser.role !== "delivery_partner") {
-          if (currentUser.data.role !== "delivery_partner") {
-            console.log("currentUser", currentUser);
-            console.log("currentUser.data.role", currentUser.data.role);
-            router.push("/delivery-partner/login");
-            return;
-          }
+          console.log("User is not a delivery partner");
+          router.push("/delivery-partner/login");
+          return;
         }
 
         setUser(currentUser as User);
@@ -163,24 +156,18 @@ export default function DeliveryPartnerDashboard() {
 
         // Fetch current order if any
         try {
-          console.log("Current user object:", currentUser);
-          console.log("Current user email:", currentUser.email);
-          console.log("Current user data email:", currentUser.data?.email);
-          const email = currentUser.email ?? currentUser.data?.email;
-          console.log("Final email being used:", email);
+          const email = currentUser.email;
+          console.log("Fetching active order for email:", email);
           const activeOrder = await orderService.getActiveOrder(email);
           console.log("Active order response:", activeOrder);
 
           if (activeOrder) {
-            console.log("Active order details:", {
-              orderId: activeOrder.orderId,
-              items: activeOrder.items,
-              totalAmount: activeOrder.totalAmount,
-              status: activeOrder.status,
-            });
-
+            console.log("Active order details:", activeOrder);
             dispatch(setCurrentOrder(activeOrder));
-            await fetchCustomerDetails(activeOrder.customerEmail);
+
+            if (activeOrder.customerEmail) {
+              await fetchCustomerDetails(activeOrder.customerEmail);
+            }
 
             // Set disabled statuses based on current order status
             if (activeOrder.status === "picked_up") {
@@ -194,46 +181,38 @@ export default function DeliveryPartnerDashboard() {
             console.log("Available orders:", availableOrders);
             if (availableOrders && availableOrders.length > 0) {
               const ordersWithDetails = await Promise.all(
-                availableOrders.map(async (order: any) => {
-                  const orderDetails: any = await orderService.getOrder(
+                availableOrders.map(async (order: Order) => {
+                  const orderDetails = await orderService.getOrder(
                     order.orderId
                   );
-
                   return {
-                    ...order,
+                    orderId: order.orderId,
                     items: orderDetails.items,
-                    total: orderDetails.total,
-                    customerEmail: orderDetails.userEmail,
-                  };
+                    total: orderDetails.totalAmount,
+                    customerEmail: orderDetails.customerEmail,
+                    status: orderDetails.status,
+                    createdAt: orderDetails.createdAt,
+                    updatedAt: orderDetails.updatedAt,
+                  } as AvailableOrder;
                 })
               );
-              console.log("Orders with details:", ordersWithDetails);
               dispatch(setAvailableOrders(ordersWithDetails));
-            } else {
-              dispatch(setAvailableOrders([]));
             }
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error("Error fetching orders:", error);
-          dispatch(setError(error.message));
-          dispatch(setAvailableOrders([]));
+          dispatch(setError("Failed to fetch orders"));
+        } finally {
+          dispatch(setLoading(false));
         }
-      } catch (error: any) {
-        console.error("Error checking authentication:", error);
-        if (error.response?.status === 401) {
-          router.push("/delivery-partner/login");
-        }
-      } finally {
-        dispatch(setLoading(false));
+      } catch (error) {
+        console.error("Error in checkAuth:", error);
+        router.push("/delivery-partner/login");
       }
     };
 
     checkAuth();
-
-    return () => {
-      dispatch(clearOrders());
-    };
-  }, [router, dispatch]);
+  }, [dispatch, router]);
 
   const handleLogout = async () => {
     try {

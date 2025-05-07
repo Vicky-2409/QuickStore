@@ -11,7 +11,7 @@ import { PaymentSubscriber } from "./events/subscribers/payment.subscriber";
 import { PaymentService } from "./services/payment.service";
 import { PaymentRepository } from "./repositories/payment.repository";
 
-// Load environment variables first
+// Load environment variables firstt
 config();
 
 // Validate required environment variable
@@ -37,6 +37,15 @@ app.use(express.json());
 // Register dependencies
 Container.set("paymentRepository", new PaymentRepository());
 
+// Register PaymentService
+Container.set(
+  "paymentService",
+  new PaymentService(
+    Container.get("paymentRepository"),
+    Container.get("rabbitChannel")
+  )
+);
+
 // Setup routing-controller
 useExpressServer(app, {
   controllers: [PaymentController],
@@ -52,13 +61,15 @@ mongoose
 // Connect to RabbitMQ and setup subscribers
 async function setupRabbitMQ() {
   try {
-    const connection = await connect(process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672");
+    const connection = await connect(
+      process.env.RABBITMQ_URL || "amqp://rabbitmq-service:5672"
+    );
     const channel = await connection.createChannel();
 
     // Store RabbitMQ channel in container
     Container.set("rabbitChannel", channel);
 
-    // Register PaymentService with the channel
+    // Update PaymentService with the channel
     Container.set(
       "paymentService",
       new PaymentService(Container.get("paymentRepository"), channel)

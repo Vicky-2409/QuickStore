@@ -1,12 +1,13 @@
 import { Controller, Post, Body } from "routing-controllers";
-import { Container } from "typedi";
+import { Service, Inject } from "typedi";
 import { PaymentService } from "../services/payment.service";
 
 @Controller("/api/payments")
+@Service()
 export class PaymentController {
-  private get paymentService(): PaymentService {
-    return Container.get("paymentService");
-  }
+  constructor(
+    @Inject("paymentService") private paymentService: PaymentService
+  ) {}
 
   @Post("/create-order")
   async createOrder(
