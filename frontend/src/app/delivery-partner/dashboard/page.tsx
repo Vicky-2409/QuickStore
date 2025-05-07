@@ -48,6 +48,8 @@ export default function DeliveryPartnerDashboard() {
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [disabledStatuses, setDisabledStatuses] = useState<string[]>([]);
+  const [isLoadingCustomer, setIsLoadingCustomer] = useState(false);
+  const [customerError, setCustomerError] = useState<string | null>(null);
 
   const handleNewOrder = useCallback(
     async (data: Order) => {
@@ -106,11 +108,21 @@ export default function DeliveryPartnerDashboard() {
   });
 
   const fetchCustomerDetails = async (email: string) => {
+    if (!email) {
+      console.log("No email provided for customer details");
+      return;
+    }
     try {
+      setIsLoadingCustomer(true);
+      setCustomerError(null);
       const customerData = await UserService.getUserByEmail(email);
       setCustomer(customerData);
     } catch (error) {
       console.error("Error fetching customer details:", error);
+      setCustomerError("Failed to load customer details");
+      setCustomer(null);
+    } finally {
+      setIsLoadingCustomer(false);
     }
   };
 
@@ -923,7 +935,38 @@ export default function DeliveryPartnerDashboard() {
                     Customer Details
                   </h3>
 
-                  {customer ? (
+                  {isLoadingCustomer ? (
+                    <div className="animate-pulse">
+                      <div className="flex items-center">
+                        <div className="h-12 w-12 rounded-full bg-slate-200"></div>
+                        <div className="ml-3">
+                          <div className="h-4 bg-slate-200 rounded w-24 mb-1"></div>
+                          <div className="h-3 bg-slate-200 rounded w-32"></div>
+                        </div>
+                      </div>
+                      <div className="h-10 bg-slate-200 rounded w-full mt-4"></div>
+                      <div className="h-20 bg-slate-200 rounded w-full mt-4"></div>
+                    </div>
+                  ) : customerError ? (
+                    <div className="text-center py-4">
+                      <div className="text-rose-500 mb-2">
+                        <svg
+                          className="w-8 h-8 mx-auto"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                        >
+                          <path
+                            d="M12 9V11M12 15H12.01M5.07183 19H18.9282C20.4678 19 21.4301 17.3333 20.6603 16L13.7321 4C12.9623 2.66667 11.0378 2.66667 10.268 4L3.33978 16C2.56998 17.3333 3.53223 19 5.07183 19Z"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                      <p className="text-slate-600">{customerError}</p>
+                    </div>
+                  ) : customer ? (
                     <div className="space-y-4">
                       <div className="flex items-center">
                         <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 text-white flex items-center justify-center font-medium text-lg shadow-sm">
@@ -1014,16 +1057,8 @@ export default function DeliveryPartnerDashboard() {
                       </div>
                     </div>
                   ) : (
-                    <div className="animate-pulse">
-                      <div className="flex items-center">
-                        <div className="h-12 w-12 rounded-full bg-slate-200"></div>
-                        <div className="ml-3">
-                          <div className="h-4 bg-slate-200 rounded w-24 mb-1"></div>
-                          <div className="h-3 bg-slate-200 rounded w-32"></div>
-                        </div>
-                      </div>
-                      <div className="h-10 bg-slate-200 rounded w-full mt-4"></div>
-                      <div className="h-20 bg-slate-200 rounded w-full mt-4"></div>
+                    <div className="text-center py-4 text-slate-500">
+                      <p>No customer details available</p>
                     </div>
                   )}
                 </div>

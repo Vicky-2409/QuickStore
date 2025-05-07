@@ -199,6 +199,12 @@ export default function CheckoutPage() {
             console.log("Razorpay payment response:", response);
             // Verify payment with order ID
             console.log("Verifying payment with Razorpay...");
+            console.log("Verifying payment with data:", {
+              orderId: order._id,
+              paymentId: response.razorpay_payment_id,
+              signature: response.razorpay_signature,
+              razorpayOrderId: payment.razorpayOrderId,
+            });
             await paymentService.verifyPayment(
               order._id,
               response.razorpay_payment_id,
