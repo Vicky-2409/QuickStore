@@ -37,15 +37,6 @@ app.use(express.json());
 // Register dependencie
 Container.set("paymentRepository", new PaymentRepository());
 
-// Register PaymentService
-Container.set(
-  "paymentService",
-  new PaymentService(
-    Container.get("paymentRepository"),
-    Container.get("rabbitChannel")
-  )
-);
-
 // Setup routing-controller
 useExpressServer(app, {
   controllers: [PaymentController],
