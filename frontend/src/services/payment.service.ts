@@ -86,6 +86,7 @@ class PaymentService {
         signature,
         razorpayOrderId,
       });
+
       const response = await axios.post(
         `${API_GATEWAY_URL}/api/payments/verify`,
         {
@@ -98,6 +99,7 @@ class PaymentService {
           headers: await this.getAuthHeaders(),
         }
       );
+
       console.log("Payment verification response:", response.data);
       return response.data;
     } catch (error) {

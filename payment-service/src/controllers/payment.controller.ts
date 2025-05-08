@@ -84,6 +84,22 @@ export class PaymentController {
         orderId,
       } = body;
 
+      // Validate required fields
+      if (
+        !razorpay_order_id ||
+        !razorpay_payment_id ||
+        !razorpay_signature ||
+        !orderId
+      ) {
+        console.error("Missing required fields:", {
+          razorpay_order_id: !!razorpay_order_id,
+          razorpay_payment_id: !!razorpay_payment_id,
+          razorpay_signature: !!razorpay_signature,
+          orderId: !!orderId,
+        });
+        throw new Error("Missing required fields for payment verification");
+      }
+
       console.log("Verifying payment with data:", {
         razorpayOrderId: razorpay_order_id,
         razorpayPaymentId: razorpay_payment_id,
@@ -98,10 +114,16 @@ export class PaymentController {
       );
 
       console.log("Payment verification successful");
-      return { success: true, message: "Payment verified successfully" };
+      return {
+        success: true,
+        message: "Payment verified successfully",
+        result,
+      };
     } catch (error) {
       console.error("Error verifying payment:", error);
-      throw new Error("Payment verification failed");
+      throw new Error(
+        error instanceof Error ? error.message : "Payment verification failed"
+      );
     }
   }
 }

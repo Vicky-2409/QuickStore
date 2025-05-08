@@ -199,17 +199,30 @@ export default function CheckoutPage() {
             console.log("Razorpay payment response:", response);
             // Verify payment with order ID
             console.log("Verifying payment with Razorpay...");
-            console.log("Verifying payment with data:", {
+
+            // Ensure we have all required fields
+            if (
+              !response.razorpay_payment_id ||
+              !response.razorpay_order_id ||
+              !response.razorpay_signature
+            ) {
+              throw new Error("Missing required Razorpay response fields");
+            }
+
+            const verificationData = {
               orderId: order._id,
-              paymentId: response.razorpay_payment_id,
-              signature: response.razorpay_signature,
-              razorpayOrderId: payment.razorpayOrderId,
-            });
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            };
+
+            console.log("Verifying payment with data:", verificationData);
+
             await paymentService.verifyPayment(
               order._id,
               response.razorpay_payment_id,
               response.razorpay_signature,
-              payment.razorpayOrderId
+              response.razorpay_order_id
             );
 
             // Clear cart and redirect
@@ -222,7 +235,11 @@ export default function CheckoutPage() {
               message.error("Session expired. Please login again.");
               router.push("/login");
             } else {
-              toast.error("Payment verification failed");
+              toast.error(
+                error.response?.data?.message ||
+                  error.message ||
+                  "Payment verification failed"
+              );
             }
           }
         },
