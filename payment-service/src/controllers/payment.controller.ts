@@ -1,13 +1,15 @@
 import { Controller, Post, Body } from "routing-controllers";
-import { Service, Inject } from "typedi";
+import { Service, Inject, Container } from "typedi";
 import { PaymentService } from "../services/payment.service";
 
 @Controller("/api/payments")
 @Service()
 export class PaymentController {
-  constructor(
-    @Inject("paymentService") private paymentService: PaymentService
-  ) {}
+  private paymentService: PaymentService;
+
+  constructor() {
+    this.paymentService = Container.get("paymentService");
+  }
 
   @Post("/create-order")
   async createOrder(
