@@ -160,21 +160,65 @@ export default function DeliveryPartnerDashboard() {
         try {
           const email = currentUser.email;
           console.log("Fetching active order for email:", email);
-          const activeOrder = await orderService.getActiveOrder(email);
-          console.log("Active order response:", activeOrder);
+          try {
+            const activeOrder = await orderService.getActiveOrder(email);
+            console.log("Active order response:", activeOrder);
 
-          if (activeOrder) {
-            console.log("Active order details:", activeOrder);
-            dispatch(setCurrentOrder(activeOrder));
+            if (activeOrder && activeOrder.order) {
+              // The API returns { order: {...} }
+              const orderData = activeOrder.order;
+              console.log("Active order details:", orderData);
+              
+              // Ensure we have a valid order with all required fields
+              const safeOrder = {
+                ...orderData,
+                orderId: orderData.orderId || orderData._id || "",
+                status: orderData.status || "pending",
+                items: orderData.items || [],
+                customerAddress: orderData.customerAddress || {
+                  street: "",
+                  city: "",
+                  state: "",
+                  zipCode: "",
+                  country: ""
+                },
+                customerEmail: orderData.customerEmail || ""
+              };
+              
+              dispatch(setCurrentOrder(safeOrder));
 
-            if (activeOrder.customerEmail) {
-              await fetchCustomerDetails(activeOrder.customerEmail);
+              if (safeOrder.customerEmail) {
+                await fetchCustomerDetails(safeOrder.customerEmail);
+              }
+            } else if (activeOrder) {
+              // If the response is the order itself
+              console.log("Alternative order format detected");
+              const safeOrder = {
+                ...activeOrder,
+                orderId: activeOrder.orderId || activeOrder._id || "",
+                status: activeOrder.status || "pending",
+                items: activeOrder.items || [],
+                customerAddress: activeOrder.customerAddress || {
+                  street: "",
+                  city: "",
+                  state: "",
+                  zipCode: "",
+                  country: ""
+                }
+              };
+              
+              dispatch(setCurrentOrder(safeOrder));
+              
+              if (safeOrder.customerEmail) {
+                await fetchCustomerDetails(safeOrder.customerEmail);
+              }
             }
 
             // Set disabled statuses based on current order status
-            if (activeOrder.status === "picked_up") {
+            const status = activeOrder.order ? activeOrder.order.status : activeOrder.status;
+            if (status === "picked_up") {
               setDisabledStatuses(["assigned"]);
-            } else if (activeOrder.status === "on_the_way") {
+            } else if (status === "on_the_way") {
               setDisabledStatuses(["assigned", "picked_up"]);
             }
           } else {
@@ -511,14 +555,14 @@ export default function DeliveryPartnerDashboard() {
               <div className="flex items-center pl-4 border-l border-slate-100">
                 <div className="mr-3 text-right">
                   <p className="text-sm font-medium text-slate-700 leading-tight">
-                    {user.name}
+                    {user?.name || "User"}
                   </p>
                   <p className="text-xs text-slate-500 truncate max-w-[120px]">
-                    {user.email}
+                    {user?.email || "user@example.com"}
                   </p>
                 </div>
                 <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-white flex items-center justify-center font-medium text-sm shadow-sm">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user && user.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </div>
                 <button
                   onClick={handleLogout}
@@ -619,11 +663,11 @@ export default function DeliveryPartnerDashboard() {
               </div>
               <div className="flex items-center py-2">
                 <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-white flex items-center justify-center font-medium">
-                  {user.name.charAt(0).toUpperCase()}
+                  {user && user.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </div>
                 <div className="ml-3">
-                  <p className="font-medium text-slate-700">{user.name}</p>
-                  <p className="text-xs text-slate-500">{user.email}</p>
+                  <p className="font-medium text-slate-700">{user?.name || "User"}</p>
+                  <p className="text-xs text-slate-500">{user?.email || "user@example.com"}</p>
                 </div>
               </div>
               <div>

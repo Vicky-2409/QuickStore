@@ -46,9 +46,15 @@ export class PaymentService {
     currency: string = "INR"
   ) {
     try {
+      console.log(`Initiating payment for order ${orderId} with amount ${amount} ${currency}`);
+      
+      // The frontend already multiplies by 100 in the createPayment method
+      // So we should NOT multiply by 100 again here to avoid double conversion
+      const amountInPaise = amount;
+      
       // Create Razorpay order
       const razorpayOrder = await this.razorpay.orders.create({
-        amount: amount * 100, // Convert to paise
+        amount: amountInPaise,
         currency,
         receipt: orderId,
       });
@@ -92,21 +98,34 @@ export class PaymentService {
     razorpaySignature: string
   ) {
     try {
-      console.log("Finding payment for order:", razorpayOrderId);
+      console.log("Verifying payment for Razorpay order:", razorpayOrderId);
+      console.log("Payment ID:", razorpayPaymentId);
+      console.log("Signature:", razorpaySignature);
+      
       // First get the payment by razorpay order id to get the orderId
+      console.log("Finding payment record by Razorpay order ID:", razorpayOrderId);
       const paymentByRazorpay =
         await this.paymentRepository.findByRazorpayOrderId(razorpayOrderId);
+      
       if (!paymentByRazorpay) {
-        throw new Error("Payment not found");
+        console.error("Payment record not found by Razorpay order ID:", razorpayOrderId);
+        throw new Error("Payment not found by Razorpay order ID");
       }
+      
+      console.log("Found payment record:", paymentByRazorpay);
 
       // Then get the complete payment record with customer information
+      console.log("Finding payment by order ID:", paymentByRazorpay.orderId);
       const payment = await this.paymentRepository.findByOrderId(
         paymentByRazorpay.orderId
       );
+      
       if (!payment) {
-        throw new Error("Payment not found");
+        console.error("Payment record not found by order ID:", paymentByRazorpay.orderId);
+        throw new Error("Payment not found by order ID");
       }
+      
+      console.log("Found complete payment record:", payment);
 
       // Generate signature using Razorpay order ID and payment ID
       const body = razorpayOrderId + "|" + razorpayPaymentId;

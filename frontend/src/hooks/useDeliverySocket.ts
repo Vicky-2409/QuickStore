@@ -24,91 +24,110 @@ export const useDeliverySocket = ({
       return;
     }
 
+    // Clean up any existing socket connection to prevent duplicate connections
+    if (socket) {
+      console.log(`[Socket] Cleaning up existing socket connection for (${userEmail})`);
+      socket.disconnect();
+      setSocket(null);
+    }
+
     console.log(
       `[Socket] Initializing delivery socket connection for (${userEmail})`
     );
 
-    const socket = io(
-      process.env.NEXT_PUBLIC_API_GATEWAY_URL || "https://thestore.pw",
-      {
-        path: "/socket.io",
-        withCredentials: true,
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-      }
-    );
-
-    socket.on("connect", () => {
-      console.log(
-        `[Socket] Delivery socket connected successfully for (${userEmail})`
+    // Use a timeout to ensure any previous socket connections have time to close
+    const initSocket = setTimeout(() => {
+      const newSocket = io(
+        process.env.NEXT_PUBLIC_API_GATEWAY_URL || "https://thestore.pw",
+        {
+          path: "/socket.io",
+          withCredentials: true,
+          transports: ["websocket", "polling"],
+          reconnection: true,
+          reconnectionAttempts: 5,
+          reconnectionDelay: 1000,
+          timeout: 10000,
+        }
       );
-      setIsConnected(true);
-      socket.emit("delivery_partner_connected", { email: userEmail });
-    });
+      
+      // Set up all event handlers on the new socket instance
+      newSocket.on("connect", () => {
+        console.log(
+          `[Socket] Delivery socket connected successfully for (${userEmail})`
+        );
+        setIsConnected(true);
+        newSocket.emit("delivery_partner_connected", { email: userEmail });
+      });
 
-    socket.on("disconnect", (reason) => {
-      console.log(
-        `[Socket] Delivery socket disconnected for (${userEmail}). Reason:`,
-        reason
-      );
-      setIsConnected(false);
-    });
+      newSocket.on("disconnect", (reason) => {
+        console.log(
+          `[Socket] Delivery socket disconnected for (${userEmail}). Reason:`,
+          reason
+        );
+        setIsConnected(false);
+      });
 
-    socket.on("connect_error", (error) => {
-      console.error(
-        `[Socket] Delivery socket connection error for (${userEmail}):`,
-        error
-      );
-    });
+      newSocket.on("connect_error", (error) => {
+        console.error(
+          `[Socket] Delivery socket connection error for (${userEmail}):`,
+          error
+        );
+      });
 
-    socket.on("reconnect", (attemptNumber) => {
-      console.log(
-        `[Socket] Delivery socket reconnected after ${attemptNumber} attempts for (${userEmail})`
-      );
-    });
+      newSocket.on("reconnect", (attemptNumber) => {
+        console.log(
+          `[Socket] Delivery socket reconnected after ${attemptNumber} attempts for (${userEmail})`
+        );
+      });
 
-    socket.on("reconnect_attempt", (attemptNumber) => {
-      console.log(
-        `[Socket] Attempting to reconnect delivery socket (${attemptNumber}) for (${userEmail})`
-      );
-    });
+      newSocket.on("reconnect_attempt", (attemptNumber) => {
+        console.log(
+          `[Socket] Attempting to reconnect delivery socket (${attemptNumber}) for (${userEmail})`
+        );
+      });
 
-    socket.on("reconnect_error", (error) => {
-      console.error(
-        `[Socket] Delivery socket reconnection error for (${userEmail}):`,
-        error
-      );
-    });
+      newSocket.on("reconnect_error", (error) => {
+        console.error(
+          `[Socket] Delivery socket reconnection error for (${userEmail}):`,
+          error
+        );
+      });
 
-    socket.on("reconnect_failed", () => {
-      console.error(
-        `[Socket] Delivery socket reconnection failed for (${userEmail})`
-      );
-    });
+      newSocket.on("reconnect_failed", () => {
+        console.error(
+          `[Socket] Delivery socket reconnection failed for (${userEmail})`
+        );
+      });
 
-    // Listen for new orders that need delivery
-    socket.on("new_order_for_delivery", (data: Order) => {
-      console.log(`[Socket] New order available for delivery:`, data);
-      onNewOrder(data);
-    });
+      // Listen for new orders that need delivery
+      newSocket.on("new_order_for_delivery", (data: Order) => {
+        console.log(`[Socket] New order available for delivery:`, data);
+        onNewOrder(data);
+      });
 
-    // Listen for orders that have been taken by other delivery partners
-    socket.on("order_taken_by_partner", (data: { orderId: string }) => {
-      console.log(
-        `[Socket] Order ${data.orderId} taken by another delivery partner`
-      );
-      onOrderTaken(data.orderId);
-    });
-
-    setSocket(socket);
+      // Listen for orders that have been taken by other delivery partners
+      newSocket.on("order_taken_by_partner", (data: { orderId: string }) => {
+        console.log(
+          `[Socket] Order ${data.orderId} taken by another delivery partner`
+        );
+        onOrderTaken(data.orderId);
+      });
+      
+      // Save the socket to state
+      setSocket(newSocket);
+    }, 500);
 
     return () => {
-      console.log(
-        `[Socket] Cleaning up delivery socket connection for (${userEmail})`
-      );
-      socket.disconnect();
+      // Clear the timeout to prevent running after component unmount
+      clearTimeout(initSocket);
+      
+      // Disconnect any existing socket
+      if (socket) {
+        console.log(
+          `[Socket] Cleaning up delivery socket connection for (${userEmail})`
+        );
+        socket.disconnect();
+      }
     };
   }, [userEmail, onNewOrder, onOrderTaken]);
 

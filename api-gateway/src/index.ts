@@ -8,7 +8,7 @@ import { createProxyRoutes } from "./routes/proxy.routes";
 import { requestLogger } from "./middlewares/logger";
 import { AppError } from "./utils/appError";
 
-// Load environment variabl
+// Load environment variables
 const envPath = path.resolve(__dirname, "../../.env");
 dotenv.config({ path: envPath });
 dotenv.config();
