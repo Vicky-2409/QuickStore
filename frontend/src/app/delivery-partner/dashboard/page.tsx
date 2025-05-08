@@ -261,12 +261,14 @@ export default function DeliveryPartnerDashboard() {
                       items: orderDetails.items,
                       total: orderDetails.total,
                       customerEmail: orderDetails.userEmail,
+                      customerAddress: orderDetails.address,
                       status: orderDetails.status,
                       createdAt: orderDetails.createdAt,
                       updatedAt: orderDetails.updatedAt,
                     } as AvailableOrder;
                   })
                 );
+                console.log("Orders with details:", ordersWithDetails);
                 dispatch(setAvailableOrders(ordersWithDetails));
               }
             }
@@ -287,6 +289,7 @@ export default function DeliveryPartnerDashboard() {
                     items: orderDetails.items,
                     total: orderDetails.total,
                     customerEmail: orderDetails.userEmail,
+                    customerAddress: orderDetails.address,
                     status: orderDetails.status,
                     createdAt: orderDetails.createdAt,
                     updatedAt: orderDetails.updatedAt,

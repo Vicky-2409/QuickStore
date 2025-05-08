@@ -128,7 +128,7 @@ export class OrderService {
   ): Promise<Order> {
     try {
       const response = await axios.put(
-        `${API_URL}/api/orders/${orderId}/status`,
+        `${API_URL}/api/delivery/order/${orderId}/status`,
         { status },
         {
           headers: await this.getAuthHeaders(),
