@@ -295,10 +295,11 @@ export class DeliveryController {
 
       const order = await this.orderService.getActiveOrder(partnerEmail);
       if (!order) {
-        return res.status(200).json({ message: "No active order found", data: [] });
+        return res.status(200).json({ message: "No active order found", data: {}
+         });
       }
 
-      res.status(200).json({ order });
+      res.status(200).json(order );
     } catch (error) {
       logger.error("Error getting active order:", error);
       res.status(500).json({ message: "Error getting active order" });

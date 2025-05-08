@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: delivery-service
-          image: svignesh2409/quick-store-delivery-service
+          image: svignesh2409/quick-store-delivery-service:v18
           ports:
             - containerPort: 4005
           envFrom:

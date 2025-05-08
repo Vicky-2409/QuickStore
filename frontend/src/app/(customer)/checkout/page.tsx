@@ -194,6 +194,8 @@ const handlePayment = async () => {
       razorpayOrderId,
     });
 
+
+
     // Initialize Razorpay with correct options
     const razorpayOptions = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",

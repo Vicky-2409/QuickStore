@@ -191,13 +191,11 @@ export class OrderService {
       const order: Order = {
         _id: orderDetails._id,
         orderId: orderDetails._id, // Using _id as orderId if not available
-        userId: "", // This might need to be extracted or derived from another field
         items: orderDetails.items || [],
-        totalAmount: orderDetails.total || 0,
+        total: orderDetails.total || 0,
         status: response.data.status || "assigned",
-        customerName: "", // Extract from user details if available
-        customerEmail: orderDetails.userEmail || response.data.customerEmail,
-        customerAddress: {
+        userEmail: orderDetails.userEmail || response.data.customerEmail,
+        address: {
           street:
             orderDetails.address?.street ||
             response.data.customerAddress?.street ||

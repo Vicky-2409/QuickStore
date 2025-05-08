@@ -109,9 +109,9 @@ export class PaymentController {
 
       const result = await this.paymentService.verifyPayment(
         orderId,
-        razorpay_order_id,
         razorpay_payment_id,
-        razorpay_signature
+        razorpay_signature,
+        razorpay_order_id 
       );
 
       console.log("Payment verification successful");

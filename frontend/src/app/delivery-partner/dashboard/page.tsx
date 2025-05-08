@@ -161,40 +161,43 @@ export default function DeliveryPartnerDashboard() {
           const email = currentUser.email;
           console.log("Fetching active order for email:", email);
           try {
-            const activeOrderResponse = await orderService.getActiveOrder(email);
+            const activeOrderResponse = await orderService.getActiveOrder(
+              email
+            );
             console.log("Active order response:", activeOrderResponse);
 
             if (activeOrderResponse && activeOrderResponse.orderId) {
               // Get full order details using the orderId
               const orderId = activeOrderResponse.orderId;
               console.log("Fetching order details for ID:", orderId);
-              
+
               try {
                 const orderDetails = await orderService.getOrderById(orderId);
                 console.log("Order details fetched:", orderDetails);
-                
+
                 // Ensure we have a valid order with all required fields
                 const safeOrder = {
                   ...orderDetails,
-                  orderId: orderDetails.orderId || orderDetails._id || orderId,
-                  status: orderDetails.status || "pending",
+                  orderId: activeOrderResponse.orderId ||orderDetails.orderId || orderDetails._id || orderId,
+                  status: activeOrderResponse.status || orderDetails.status || "pending",
                   items: orderDetails.items || [],
-                  customerAddress: orderDetails.customerAddress || {
+                  customerAddress: activeOrderResponse.address || orderDetails.address || {
                     street: "",
                     city: "",
                     state: "",
                     zipCode: "",
-                    country: ""
+                    country: "",
                   },
-                  customerEmail: orderDetails.customerEmail || ""
+                  customerEmail: orderDetails.userEmail || "",
                 };
-                
+
+                console.log("Dispatching setCurrentOrder with:", safeOrder);
                 dispatch(setCurrentOrder(safeOrder));
-  
+
                 if (safeOrder.customerEmail) {
                   await fetchCustomerDetails(safeOrder.customerEmail);
                 }
-                
+
                 // Set disabled statuses based on current order status
                 if (safeOrder.status === "picked_up") {
                   setDisabledStatuses(["assigned"]);
@@ -202,29 +205,39 @@ export default function DeliveryPartnerDashboard() {
                   setDisabledStatuses(["assigned", "picked_up"]);
                 }
               } catch (orderDetailError) {
-                console.error("Failed to fetch order details:", orderDetailError);
+                console.error(
+                  "Failed to fetch order details:",
+                  orderDetailError
+                );
                 // Fallback: Use the base activeOrderResponse
                 const safeOrder = {
                   ...activeOrderResponse,
-                  orderId: activeOrderResponse.orderId || activeOrderResponse._id || "",
+                  orderId:
+                    activeOrderResponse.orderId ||
+                    activeOrderResponse._id ||
+                    "",
                   status: activeOrderResponse.status || "pending",
                   items: activeOrderResponse.items || [],
-                  customerAddress: activeOrderResponse.customerAddress || {
+                  customerAddress: activeOrderResponse.address || {
                     street: "",
                     city: "",
                     state: "",
                     zipCode: "",
-                    country: ""
+                    country: "",
                   },
-                  customerEmail: activeOrderResponse.customerEmail || ""
+                  customerEmail: activeOrderResponse.userEmail || "",
                 };
-                
+
+                console.log(
+                  "Dispatching setCurrentOrder with fallback:",
+                  safeOrder
+                );
                 dispatch(setCurrentOrder(safeOrder));
-                
+
                 if (safeOrder.customerEmail) {
                   await fetchCustomerDetails(safeOrder.customerEmail);
                 }
-                
+
                 // Set disabled statuses based on current order status
                 if (safeOrder.status === "picked_up") {
                   setDisabledStatuses(["assigned"]);
@@ -232,10 +245,31 @@ export default function DeliveryPartnerDashboard() {
                   setDisabledStatuses(["assigned", "picked_up"]);
                 }
               }
+            } else {
+              console.log("No active order found, fetching available orders");
+              const availableOrders = await orderService.getPendingOrders();
+              console.log("Available orders:", availableOrders);
+              if (availableOrders && availableOrders.length > 0) {
+                const ordersWithDetails = await Promise.all(
+                  availableOrders.map(async (order: Order) => {
+                    const orderId = order.orderId || order._id;
+                    const orderDetails = await orderService.getOrder(
+                      orderId
+                    );
+                    return {
+                      orderId: order.orderId,
+                      items: orderDetails.items,
+                      total: orderDetails.total,
+                      customerEmail: orderDetails.userEmail,
+                      status: orderDetails.status,
+                      createdAt: orderDetails.createdAt,
+                      updatedAt: orderDetails.updatedAt,
+                    } as AvailableOrder;
+                  })
+                );
+                dispatch(setAvailableOrders(ordersWithDetails));
+              }
             }
-            // This code was referencing a non-existent 'status' variable
-            // The statusflow is already handled in the fetchOrderDetails blocks above
-            // This code can safely be removed
           } catch (error) {
             console.error("Error fetching active order:", error);
             console.log("No active order found, fetching available orders");
@@ -244,14 +278,15 @@ export default function DeliveryPartnerDashboard() {
             if (availableOrders && availableOrders.length > 0) {
               const ordersWithDetails = await Promise.all(
                 availableOrders.map(async (order: Order) => {
+                  const orderId = order.orderId || order._id;
                   const orderDetails = await orderService.getOrder(
-                    order.orderId
+                    orderId
                   );
                   return {
                     orderId: order.orderId,
                     items: orderDetails.items,
-                    total: orderDetails.totalAmount,
-                    customerEmail: orderDetails.customerEmail,
+                    total: orderDetails.total,
+                    customerEmail: orderDetails.userEmail,
                     status: orderDetails.status,
                     createdAt: orderDetails.createdAt,
                     updatedAt: orderDetails.updatedAt,
@@ -578,8 +613,8 @@ export default function DeliveryPartnerDashboard() {
                   </p>
                 </div>
                 <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-white flex items-center justify-center font-medium text-sm shadow-sm">
-                  {user && user.name && user.name.length > 0 
-                    ? user.name.charAt(0).toUpperCase() 
+                  {user && user.name && user.name.length > 0
+                    ? user.name.charAt(0).toUpperCase()
                     : "U"}
                 </div>
                 <button
@@ -681,13 +716,17 @@ export default function DeliveryPartnerDashboard() {
               </div>
               <div className="flex items-center py-2">
                 <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-600 to-blue-500 text-white flex items-center justify-center font-medium">
-                  {user && user.name && user.name.length > 0 
-                    ? user.name.charAt(0).toUpperCase() 
+                  {user && user.name && user.name.length > 0
+                    ? user.name.charAt(0).toUpperCase()
                     : "U"}
                 </div>
                 <div className="ml-3">
-                  <p className="font-medium text-slate-700">{user?.name || "User"}</p>
-                  <p className="text-xs text-slate-500">{user?.email || "user@example.com"}</p>
+                  <p className="font-medium text-slate-700">
+                    {user?.name || "User"}
+                  </p>
+                  <p className="text-xs text-slate-500">
+                    {user?.email || "user@example.com"}
+                  </p>
                 </div>
               </div>
               <div>
@@ -779,7 +818,7 @@ export default function DeliveryPartnerDashboard() {
                 </div>
                 <div className="flex items-center">
                   <div className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-lg text-white text-sm font-medium">
-                    #{currentOrder.orderId.slice(-6)}
+                    #{ currentOrder.orderId ? currentOrder.orderId.slice(-6) : currentOrder._id.slice(-6)}
                   </div>
                 </div>
               </div>
@@ -1094,12 +1133,19 @@ export default function DeliveryPartnerDashboard() {
                             />
                           </svg>
                           <div>
-                            <p className="text-sm text-slate-700 leading-relaxed">
-                              {currentOrder.customerAddress.street},<br />
-                              {currentOrder.customerAddress.city},{" "}
-                              {currentOrder.customerAddress.state}{" "}
-                              {currentOrder.customerAddress.zipCode}
-                            </p>
+                            {currentOrder.address && (
+                              <p className="text-sm text-slate-700 leading-relaxed">
+                                {currentOrder.address.street},<br />
+                                {currentOrder.address.city},{" "}
+                                {currentOrder.address.state}{" "}
+                                {currentOrder.address.zipCode}
+                              </p>
+                            )}
+                            {!currentOrder.address && (
+                              <p className="text-sm text-slate-700 leading-relaxed">
+                                No address available
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -1172,7 +1218,7 @@ export default function DeliveryPartnerDashboard() {
                         <div className="flex justify-between items-center">
                           <div className="text-sm text-slate-500">Subtotal</div>
                           <div className="font-medium">
-                            ${currentOrder.totalAmount?.toFixed(2) || "0.00"}
+                            ${currentOrder.total?.toFixed(2) || "0.00"}
                           </div>
                         </div>
                         <div className="flex justify-between items-center mt-2">
@@ -1184,7 +1230,7 @@ export default function DeliveryPartnerDashboard() {
                         <div className="flex justify-between items-center mt-3 pt-3 border-t border-slate-100">
                           <div className="font-medium">Total</div>
                           <div className="text-lg font-bold text-indigo-600">
-                            ${currentOrder.totalAmount?.toFixed(2) || "0.00"}
+                            ${currentOrder.total?.toFixed(2) || "0.00"}
                           </div>
                         </div>
                       </div>
@@ -1229,7 +1275,7 @@ export default function DeliveryPartnerDashboard() {
                         value={currentOrder.status}
                         onChange={(e) =>
                           handleUpdateStatus(
-                            currentOrder.orderId,
+                            currentOrder.orderId || "",
                             e.target.value as OrderStatus
                           )
                         }
@@ -1272,7 +1318,7 @@ export default function DeliveryPartnerDashboard() {
                     <button
                       onClick={() =>
                         handleUpdateStatus(
-                          currentOrder.orderId,
+                          currentOrder.orderId || "",
                           getNextStatus(currentOrder.status)!
                         )
                       }
@@ -1477,10 +1523,10 @@ export default function DeliveryPartnerDashboard() {
                             />
                           </svg>
                           <p className="ml-2 text-sm text-slate-600 line-clamp-2">
-                            {order.customerAddress.street},{" "}
-                            {order.customerAddress.city},{" "}
-                            {order.customerAddress.state}{" "}
-                            {order.customerAddress.zipCode}
+                            {order.customerAddress?.street || "N/A"},{" "}
+                            {order.customerAddress?.city || "N/A"},{" "}
+                            {order.customerAddress?.state || "N/A"}{" "}
+                            {order.customerAddress?.zipCode || "N/A"}
                           </p>
                         </div>
 

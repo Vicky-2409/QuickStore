@@ -18,20 +18,18 @@ export interface OrderItem {
 
 export interface Order {
   _id: string;
-  orderId: string;
-  userId: string;
+  userEmail: string;
   items: OrderItem[];
-  totalAmount: number;
+  total: number;
   status: OrderStatus;
-  customerName: string;
-  customerEmail: string;
-  customerAddress: {
+  address: {
     street: string;
     city: string;
     state: string;
     zipCode: string;
     country: string;
   };
+  orderId?: string;
   assignedPartnerId?: string;
   createdAt: string;
   updatedAt: string;
