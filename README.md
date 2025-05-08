@@ -1,4 +1,4 @@
-﻿# QuickStore - Multi-Service E-Commerce Platform
+# QuickStore - Multi-Service E-Commerce Platform
 
 ## 1. Project Overview
 
@@ -6,7 +6,49 @@ QuickStore is a scalable, microservices-based e-commerce platform supporting use
 
 ---
 
-<pre> ```mermaid flowchart LR subgraph Frontend FE[Next.js Frontend] end subgraph Backend API[API Gateway] AUTH[Auth Service] US[User Service] PS[Product Service] OS[Order Service] PAY[Payment Service] DS[Delivery Service] end subgraph Infra MQ[(RabbitMQ)] DB[(MongoDB Atlas)] S3[(AWS S3)] end FE <--> API API <--> AUTH API <--> US API <--> PS API <--> OS API <--> PAY API <--> DS AUTH <--> MQ US <--> MQ PS <--> MQ OS <--> MQ PAY <--> MQ DS <--> MQ AUTH <--> DB US <--> DB PS <--> DB OS <--> DB PAY <--> DB DS <--> DB PS <--> S3 ``` </pre>
+## 2. System Architecture Diagram
+
+```mermaid
+flowchart LR
+    subgraph Frontend
+        FE[Next.js Frontend]
+    end
+    subgraph Backend
+        API[API Gateway]
+        AUTH[Auth Service]
+        US[User Service]
+        PS[Product Service]
+        OS[Order Service]
+        PAY[Payment Service]
+        DS[Delivery Service]
+    end
+    subgraph Infra
+        MQ[(RabbitMQ)]
+        DB[(MongoDB Atlas)]
+        S3[(AWS S3)]
+    end
+    FE <--> API
+    API <--> AUTH
+    API <--> US
+    API <--> PS
+    API <--> OS
+    API <--> PAY
+    API <--> DS
+    AUTH <--> MQ
+    US <--> MQ
+    PS <--> MQ
+    OS <--> MQ
+    PAY <--> MQ
+    DS <--> MQ
+    AUTH <--> DB
+    US <--> DB
+    PS <--> DB
+    OS <--> DB
+    PAY <--> DB
+    DS <--> DB
+    PS <--> S3
+```
+
 ---
 
 ## 3. Stack Used
