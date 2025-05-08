@@ -100,13 +100,13 @@ export const useDeliverySocket = ({
       });
 
       // Listen for new orders that need delivery
-      newSocket.on("new_order_for_delivery", (data: Order) => {
+      newSocket.on("new_order", (data: Order) => {
         console.log(`[Socket] New order available for delivery:`, data);
         onNewOrder(data);
       });
 
       // Listen for orders that have been taken by other delivery partners
-      newSocket.on("order_taken_by_partner", (data: { orderId: string }) => {
+      newSocket.on("order_taken", (data: { orderId: string }) => {
         console.log(
           `[Socket] Order ${data.orderId} taken by another delivery partner`
         );
