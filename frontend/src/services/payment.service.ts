@@ -4,11 +4,14 @@ import { getValidAccessToken } from "@/utils/auth";
 const API_GATEWAY_URL = "https://thestore.pw";
 
 export interface PaymentResponse {
-  id: string;
-  amount: number;
-  currency: string;
-  receipt: string;
-  razorpayOrderId: string;
+  success: boolean;
+  order: {
+    id: string;
+    amount: number;
+    currency: string;
+    receipt: string;
+    razorpayOrderId: string;
+  };
 }
 
 export interface PaymentVerificationResponse {
@@ -80,17 +83,20 @@ class PaymentService {
     razorpayOrderId: string
   ): Promise<PaymentVerificationResponse> {
     try {
+      // If we don't have the order ID from the response, use the one from our payment
+      const orderIdToUse = razorpayOrderId || paymentId;
+
       console.log("Verifying payment with data:", {
         orderId,
         paymentId,
         signature,
-        razorpayOrderId,
+        razorpayOrderId: orderIdToUse,
       });
 
       const response = await axios.post(
         `${API_GATEWAY_URL}/api/payments/verify`,
         {
-          razorpay_order_id: razorpayOrderId,
+          razorpay_order_id: orderIdToUse,
           razorpay_payment_id: paymentId,
           razorpay_signature: signature,
           orderId,

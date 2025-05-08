@@ -9,7 +9,8 @@ import { IPayment } from "../models/payment.model";
 
 dotenv.config();
 
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || "bhtVpaw0zDw5uCY9ybVGEYRE";
+const RAZORPAY_KEY_SECRET =
+  process.env.RAZORPAY_KEY_SECRET || "bhtVpaw0zDw5uCY9ybVGEYRE";
 const API_GATEWAY_URL = process.env.API_GATEWAY_URL || "https://thestore.pw";
 
 if (!RAZORPAY_KEY_SECRET) {
@@ -46,25 +47,49 @@ export class PaymentService {
     currency: string = "INR"
   ) {
     try {
-      console.log(`Initiating payment for order ${orderId} with amount ${amount} ${currency}`);
-      
-      // The frontend already multiplies by 100 in the createPayment method
-      // So we should NOT multiply by 100 again here to avoid double conversion
-      const amountInPaise = amount;
-      
+      console.log("=== Payment Initiation Started ===");
+      console.log("Input parameters:", {
+        orderId,
+        amount,
+        currency,
+        customerEmail,
+        customerAddress,
+      });
+
+      // Convert amount to paise (multiply by 100)
+      const amountInPaise = amount * 100;
+      console.log("Amount conversion:", {
+        originalAmount: amount,
+        amountInPaise,
+        currency,
+      });
+
       // Create Razorpay order
+      console.log("Creating Razorpay order with params:", {
+        amount: amountInPaise,
+        currency,
+        receipt: orderId,
+      });
+
       const razorpayOrder = await this.razorpay.orders.create({
         amount: amountInPaise,
         currency,
         receipt: orderId,
       });
 
-      console.log("Razorpay order created:", razorpayOrder);
+      console.log("Razorpay order created successfully:", {
+        orderId: razorpayOrder.id,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency,
+        receipt: razorpayOrder.receipt,
+        status: razorpayOrder.status,
+      });
 
       // Create payment record with the same Razorpay order ID
+      console.log("Creating payment record in database...");
       const payment = await this.paymentRepository.create({
         orderId,
-        amount,
+        amount: amountInPaise,
         currency,
         status: "pending",
         razorpayOrderId: razorpayOrder.id,
@@ -72,22 +97,37 @@ export class PaymentService {
         customerAddress,
       });
 
-      console.log("Payment record created:", {
+      console.log("Payment record created successfully:", {
         paymentId: payment._id,
-        razorpayOrderId: razorpayOrder.id,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
+        orderId: payment.orderId,
+        razorpayOrderId: payment.razorpayOrderId,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status,
       });
 
-      return {
-        id: razorpayOrder.id,
-        amount: razorpayOrder.amount,
-        currency: razorpayOrder.currency,
-        receipt: razorpayOrder.receipt,
-        razorpayOrderId: razorpayOrder.id,
+      const response = {
+        success: true,
+        order: {
+          id: razorpayOrder.id,
+          amount: razorpayOrder.amount,
+          currency: razorpayOrder.currency,
+          receipt: razorpayOrder.receipt,
+          razorpayOrderId: razorpayOrder.id,
+        },
       };
+
+      console.log("Returning payment initiation response:", response);
+      console.log("=== Payment Initiation Completed ===");
+
+      return response;
     } catch (error) {
-      console.error("Error initiating payment:", error);
+      console.error("=== Payment Initiation Failed ===");
+      console.error("Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        error,
+      });
       throw new Error("Failed to initiate payment");
     }
   }
@@ -98,34 +138,60 @@ export class PaymentService {
     razorpaySignature: string
   ) {
     try {
-      console.log("Verifying payment for Razorpay order:", razorpayOrderId);
-      console.log("Payment ID:", razorpayPaymentId);
-      console.log("Signature:", razorpaySignature);
-      
+      console.log("=== Payment Verification Started ===");
+      console.log("Verification parameters:", {
+        razorpayOrderId,
+        razorpayPaymentId,
+        razorpaySignature,
+      });
+
       // First get the payment by razorpay order id to get the orderId
-      console.log("Finding payment record by Razorpay order ID:", razorpayOrderId);
+      console.log(
+        "Finding payment record by Razorpay order ID:",
+        razorpayOrderId
+      );
       const paymentByRazorpay =
         await this.paymentRepository.findByRazorpayOrderId(razorpayOrderId);
-      
+
       if (!paymentByRazorpay) {
-        console.error("Payment record not found by Razorpay order ID:", razorpayOrderId);
+        console.error(
+          "Payment record not found by Razorpay order ID:",
+          razorpayOrderId
+        );
         throw new Error("Payment not found by Razorpay order ID");
       }
-      
-      console.log("Found payment record:", paymentByRazorpay);
+
+      console.log("Found payment record by Razorpay order ID:", {
+        paymentId: paymentByRazorpay._id,
+        orderId: paymentByRazorpay.orderId,
+        amount: paymentByRazorpay.amount,
+        status: paymentByRazorpay.status,
+      });
 
       // Then get the complete payment record with customer information
-      console.log("Finding payment by order ID:", paymentByRazorpay.orderId);
+      console.log(
+        "Finding complete payment record by order ID:",
+        paymentByRazorpay.orderId
+      );
       const payment = await this.paymentRepository.findByOrderId(
         paymentByRazorpay.orderId
       );
-      
+
       if (!payment) {
-        console.error("Payment record not found by order ID:", paymentByRazorpay.orderId);
+        console.error(
+          "Complete payment record not found by order ID:",
+          paymentByRazorpay.orderId
+        );
         throw new Error("Payment not found by order ID");
       }
-      
-      console.log("Found complete payment record:", payment);
+
+      console.log("Found complete payment record:", {
+        paymentId: payment._id,
+        orderId: payment.orderId,
+        amount: payment.amount,
+        status: payment.status,
+        customerEmail: payment.customerEmail,
+      });
 
       // Generate signature using Razorpay order ID and payment ID
       const body = razorpayOrderId + "|" + razorpayPaymentId;
@@ -134,25 +200,38 @@ export class PaymentService {
         .update(body)
         .digest("hex");
 
-      console.log("Signature verification:", {
+      console.log("Signature verification details:", {
         received: razorpaySignature,
         expected: expectedSignature,
         body,
-        secret: this.RAZORPAY_KEY_SECRET,
+        secret: this.RAZORPAY_KEY_SECRET.substring(0, 5) + "...", // Only log first 5 chars of secret
       });
 
       if (expectedSignature !== razorpaySignature) {
+        console.error("Signature verification failed:", {
+          received: razorpaySignature,
+          expected: expectedSignature,
+        });
         throw new Error("Invalid payment signature");
       }
 
+      console.log("Signature verification successful");
+
       // Update payment status
+      console.log("Updating payment status to completed...");
       const updatedPayment = await this.paymentRepository.updateStatus(
         payment.orderId,
         "completed",
         { paymentId: razorpayPaymentId, signature: razorpaySignature }
       );
 
-      console.log("Payment status updated, preparing to publish event...");
+      console.log("Payment status updated successfully:", {
+        paymentId: updatedPayment?._id,
+        orderId: updatedPayment?.orderId,
+        status: updatedPayment?.status,
+      });
+
+      console.log("Preparing to publish events...");
 
       try {
         // Ensure exchanges exist before publishing
@@ -160,9 +239,7 @@ export class PaymentService {
         await this.channel.assertExchange("payment", "topic", {
           durable: true,
         });
-        await this.channel.assertExchange("orders", "topic", {
-          durable: true,
-        });
+        await this.channel.assertExchange("orders", "topic", { durable: true });
         console.log("Exchanges asserted successfully");
 
         // Publish payment success event for order service
@@ -198,13 +275,23 @@ export class PaymentService {
 
         console.log("Events published successfully");
       } catch (error) {
-        console.error("Error publishing events:", error);
+        console.error("Error publishing events:", {
+          message: error instanceof Error ? error.message : "Unknown error",
+          stack: error instanceof Error ? error.stack : undefined,
+          error,
+        });
         throw error;
       }
 
+      console.log("=== Payment Verification Completed Successfully ===");
       return updatedPayment;
     } catch (error) {
-      console.error("Error verifying payment:", error);
+      console.error("=== Payment Verification Failed ===");
+      console.error("Error details:", {
+        message: error instanceof Error ? error.message : "Unknown error",
+        stack: error instanceof Error ? error.stack : undefined,
+        error,
+      });
       throw new Error("Payment verification failed");
     }
   }

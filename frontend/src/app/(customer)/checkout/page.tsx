@@ -177,23 +177,14 @@ export default function CheckoutPage() {
       console.log("Payment created:", payment);
 
       // Initialize Razorpay
-      console.log("Initializing Razorpay with options:", {
+      const razorpayOptions = {
         key:
           process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
-        amount: payment.amount,
-        currency: "INR",
-        name: "Your Store Name",
-        description: "Order Payment",
-        order_id: payment.razorpayOrderId,
-      });
-      const options = {
-        key:
-          process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
-        amount: payment.amount,
+        amount: payment.order.amount,
         currency: "INR",
         name: "Quick Shop",
         description: "Order Payment",
-        order_id: payment.razorpayOrderId,
+        order_id: payment.order.razorpayOrderId,
         handler: async (response: any) => {
           try {
             console.log("Razorpay payment response:", response);
@@ -206,6 +197,7 @@ export default function CheckoutPage() {
               !response.razorpay_order_id ||
               !response.razorpay_signature
             ) {
+              console.error("Missing Razorpay response fields:", response);
               throw new Error("Missing required Razorpay response fields");
             }
 
@@ -250,18 +242,62 @@ export default function CheckoutPage() {
         theme: {
           color: "#10b981",
         },
-        modal: {
-          ondismiss: function () {
-            console.log("Payment window closed");
-          },
-        },
         notes: {
           orderId: order._id,
         },
         callback_url: `${window.location.origin}/api/payments/verify`,
+        // Add these options to ensure we get all required fields in the response
+        config: {
+          display: {
+            blocks: {
+              banks: {
+                name: "Pay using UPI",
+                instruments: [
+                  {
+                    method: "upi",
+                    flow: "intent",
+                    intent: {
+                      flow: "collect",
+                      prefill: {
+                        email: user?.email,
+                        contact: user?.phone,
+                      },
+                    },
+                  },
+                ],
+              },
+            },
+            sequence: ["block.banks"],
+            preferences: {
+              show_default_blocks: true,
+            },
+          },
+        },
+        // Add these options to fix SVG errors and ensure proper response
+        image: {
+          width: "100%",
+          height: "100%",
+        },
+        retry: {
+          enabled: true,
+          max_count: 3,
+        },
+        remember_customer: true,
+        callback_handler: function (response: any) {
+          console.log("Callback handler response:", response);
+        },
+        modal: {
+          ondismiss: function () {
+            console.log("Payment window closed");
+          },
+          escape: true,
+          backdropclose: false,
+        },
       };
 
-      const razorpay = new (window as any).Razorpay(options);
+      console.log("Initializing Razorpay with options:", razorpayOptions);
+
+      const razorpay = new (window as any).Razorpay(razorpayOptions);
       console.log("Opening Razorpay payment window...");
       razorpay.open();
     } catch (error: any) {
