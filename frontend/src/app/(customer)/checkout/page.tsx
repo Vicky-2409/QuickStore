@@ -20,7 +20,7 @@ import { isAuthenticated } from "@/utils/auth";
 import { loadScript } from "@/utils/razorpay";
 import { UserService } from "@/services/userService";
 import { orderService } from "@/services/order.service";
-import { paymentService } from "@/services/payment.service";
+import { paymentService, PaymentResponse } from "@/services/payment.service";
 import { cartService } from "@/services/cartService";
 import { toast } from "react-hot-toast";
 import {
@@ -115,203 +115,176 @@ export default function CheckoutPage() {
     }
   };
 
-  const handlePayment = async () => {
-    if (!isAuthenticated()) {
-      message.error("Please login to continue");
-      router.push("/login");
-      return;
-    }
+// Fix the handlePayment function to properly handle Razorpay integration
+const handlePayment = async () => {
+  if (!isAuthenticated()) {
+    message.error("Please login to continue");
+    router.push("/login");
+    return;
+  }
 
-    if (!user?.email) {
-      message.error("User data not loaded. Please refresh the page.");
-      return;
-    }
+  if (!user?.email) {
+    message.error("User data not loaded. Please refresh the page.");
+    return;
+  }
 
-    if (!selectedAddress) {
-      message.error("Please select a shipping address");
-      return;
-    }
+  if (!selectedAddress) {
+    message.error("Please select a shipping address");
+    return;
+  }
 
-    try {
-      setLoading(true);
-      console.log("Starting payment process...");
+  try {
+    setLoading(true);
+    console.log("Starting payment process...");
 
-      // Create order first
-      console.log("Creating order with items:", items);
-      const order = await orderService.createOrder({
-        items: items.map((item: CartItem) => ({
-          product: {
-            _id: item.product._id,
-            name: item.product.name,
-            price: item.product.price,
-            imageUrl: item.product.imageUrl,
-          },
-          quantity: item.quantity,
-        })),
-        total,
-        address: {
-          street: selectedAddress.street,
-          city: selectedAddress.city,
-          state: selectedAddress.state,
-          zipCode: selectedAddress.zipCode,
-          country: selectedAddress.country,
+    // Create order first
+    console.log("Creating order with items:", items);
+    const order = await orderService.createOrder({
+      items: items.map((item: CartItem) => ({
+        product: {
+          _id: item.product._id,
+          name: item.product.name,
+          price: item.product.price,
+          imageUrl: item.product.imageUrl,
         },
-        userEmail: user.email,
-      });
-      console.log("Order created:", order);
+        quantity: item.quantity,
+      })),
+      total,
+      address: {
+        street: selectedAddress.street,
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        zipCode: selectedAddress.zipCode,
+        country: selectedAddress.country,
+      },
+      userEmail: user.email,
+    });
+    console.log("Order created:", order);
 
-      // Create payment with order ID
-      console.log("Creating payment for order:", order._id);
-      const payment = await paymentService.createPayment(
-        total,
-        order._id,
-        user.email,
-        {
-          street: selectedAddress.street,
-          city: selectedAddress.city,
-          state: selectedAddress.state,
-          zipCode: selectedAddress.zipCode,
-          country: selectedAddress.country,
-        }
-      );
-      console.log("Payment created:", payment);
-
-      // Initialize Razorpay
-      const razorpayOptions = {
-        key:
-          process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
-        amount: payment.order.amount,
-        currency: "INR",
-        name: "Quick Shop",
-        description: "Order Payment",
-        order_id: payment.order.razorpayOrderId,
-        handler: async (response: any) => {
-          try {
-            console.log("Razorpay payment response:", response);
-            // Verify payment with order ID
-            console.log("Verifying payment with Razorpay...");
-
-            // Ensure we have all required fields
-            if (
-              !response.razorpay_payment_id ||
-              !response.razorpay_order_id ||
-              !response.razorpay_signature
-            ) {
-              console.error("Missing Razorpay response fields:", response);
-              throw new Error("Missing required Razorpay response fields");
-            }
-
-            const verificationData = {
-              orderId: order._id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            };
-
-            console.log("Verifying payment with data:", verificationData);
-
-            await paymentService.verifyPayment(
-              order._id,
-              response.razorpay_payment_id,
-              response.razorpay_signature,
-              response.razorpay_order_id
-            );
-
-            // Clear cart and redirect
-            console.log("Payment verified successfully, clearing cart...");
-            cartService.clearCart();
-            router.push("/orders");
-          } catch (error: any) {
-            console.error("Payment verification failed:", error);
-            if (error.response?.status === 401) {
-              message.error("Session expired. Please login again.");
-              router.push("/login");
-            } else {
-              toast.error(
-                error.response?.data?.message ||
-                  error.message ||
-                  "Payment verification failed"
-              );
-            }
-          }
-        },
-        prefill: {
-          name: user?.name,
-          email: user?.email,
-        },
-        theme: {
-          color: "#10b981",
-        },
-        notes: {
-          orderId: order._id,
-        },
-        callback_url: `${window.location.origin}/api/payments/verify`,
-        // Add these options to ensure we get all required fields in the response
-        config: {
-          display: {
-            blocks: {
-              banks: {
-                name: "Pay using UPI",
-                instruments: [
-                  {
-                    method: "upi",
-                    flow: "intent",
-                    intent: {
-                      flow: "collect",
-                      prefill: {
-                        email: user?.email,
-                        contact: user?.phone,
-                      },
-                    },
-                  },
-                ],
-              },
-            },
-            sequence: ["block.banks"],
-            preferences: {
-              show_default_blocks: true,
-            },
-          },
-        },
-        // Add these options to fix SVG errors and ensure proper response
-        image: {
-          width: "100%",
-          height: "100%",
-        },
-        retry: {
-          enabled: true,
-          max_count: 3,
-        },
-        remember_customer: true,
-        callback_handler: function (response: any) {
-          console.log("Callback handler response:", response);
-        },
-        modal: {
-          ondismiss: function () {
-            console.log("Payment window closed");
-          },
-          escape: true,
-          backdropclose: false,
-        },
-      };
-
-      console.log("Initializing Razorpay with options:", razorpayOptions);
-
-      const razorpay = new (window as any).Razorpay(razorpayOptions);
-      console.log("Opening Razorpay payment window...");
-      razorpay.open();
-    } catch (error: any) {
-      console.error("Payment process failed:", error);
-      if (error.response?.status === 401) {
-        message.error("Session expired. Please login again.");
-        router.push("/login");
-      } else {
-        toast.error("Failed to process payment");
+    // Create payment with order ID
+    console.log("Creating payment for order:", order._id);
+    const payment = await paymentService.createPayment(
+      total,
+      order._id,
+      user.email,
+      {
+        street: selectedAddress.street,
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        zipCode: selectedAddress.zipCode,
+        country: selectedAddress.country,
       }
-    } finally {
-      setLoading(false);
+    );
+    console.log("Payment created:", payment);
+    
+    // Extract payment response properly
+    const paymentResponse = payment as PaymentResponse;
+    
+    // Ensure we have the correct order details and proper error handling
+    if (!paymentResponse.order || !paymentResponse.order.razorpayOrderId) {
+      throw new Error("Invalid payment response from server: Missing order details");
     }
-  };
+    
+    const razorpayOrderId = paymentResponse.order.razorpayOrderId;
+    const amount = paymentResponse.order.amount;
+    
+    console.log("Payment order details:", {
+      amount,
+      orderId: order._id,
+      razorpayOrderId,
+    });
+
+    // Initialize Razorpay with correct options
+    const razorpayOptions = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_Wsp2NzIUWHF2Cm",
+      amount: amount, // Amount in paisa
+      currency: "INR",
+      name: "Quick Shop",
+      description: "Order Payment",
+      order_id: razorpayOrderId, // Use the razorpayOrderId from server
+      receipt: order._id,
+      prefill: {
+        name: user?.name,
+        email: user?.email,
+      },
+      theme: {
+        color: "#10b981",
+      },
+      notes: {
+        orderId: order._id,
+      },
+      // Define handler as function to keep proper scope
+      handler: function(response) {
+        // Log the complete response for debugging
+        console.log("Razorpay payment response:", response);
+        
+        // Verify all needed fields exist before proceeding
+        if (!response.razorpay_payment_id || !response.razorpay_order_id || !response.razorpay_signature) {
+          console.error("Missing Razorpay response fields:", response);
+          toast.error("Payment verification failed: Missing response data");
+          setLoading(false);
+          return;
+        }
+        
+        // Call verify payment API with all required fields
+        paymentService.verifyPayment(
+          order._id,
+          response.razorpay_payment_id,
+          response.razorpay_signature,
+          response.razorpay_order_id
+        )
+        .then(() => {
+          console.log("Payment verified successfully");
+          cartService.clearCart();
+          router.push("/orders");
+        })
+        .catch((error) => {
+          console.error("Payment verification failed:", error);
+          if (error.response?.status === 401) {
+            message.error("Session expired. Please login again.");
+            router.push("/login");
+          } else {
+            toast.error(
+              error.response?.data?.message ||
+                error.message ||
+                "Payment verification failed"
+            );
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+      },
+      modal: {
+        ondismiss: function() {
+          console.log("Payment window closed");
+          setLoading(false);
+        },
+        escape: true,
+        backdropclose: false,
+      },
+    };
+
+    console.log("Initializing Razorpay with options:", razorpayOptions);
+
+    const razorpay = new (window as any).Razorpay(razorpayOptions);
+    console.log("Opening Razorpay payment window...");
+    razorpay.open();
+  } catch (error: any) {
+    console.error("Payment process failed:", error);
+    setLoading(false);
+    if (error.response?.status === 401) {
+      message.error("Session expired. Please login again.");
+      router.push("/login");
+    } else {
+      toast.error(
+        error.response?.data?.message || 
+        error.message ||
+        "Failed to process payment"
+      );
+    }
+  }
+};
 
   if (status === "loading") {
     return (

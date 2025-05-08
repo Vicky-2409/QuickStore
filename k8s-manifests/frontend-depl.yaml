@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: svignesh2409/quick-store-frontend-service:v7
+          image: svignesh2409/quick-store-frontend-service:v10
           envFrom:
             - configMapRef:
                 name: frontend-env

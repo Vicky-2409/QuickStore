@@ -59,8 +59,7 @@ class PaymentService {
       const response = await axios.post(
         `${API_GATEWAY_URL}/api/payments/create-order`,
         {
-          amount: amount * 100, // Convert to paise
-          currency: "INR",
+          amount,
           orderId,
           customerEmail: userEmail,
           customerAddress: address,
@@ -83,20 +82,18 @@ class PaymentService {
     razorpayOrderId: string
   ): Promise<PaymentVerificationResponse> {
     try {
-      // If we don't have the order ID from the response, use the one from our payment
-      const orderIdToUse = razorpayOrderId || paymentId;
 
       console.log("Verifying payment with data:", {
         orderId,
         paymentId,
         signature,
-        razorpayOrderId: orderIdToUse,
+        razorpayOrderId,
       });
 
       const response = await axios.post(
         `${API_GATEWAY_URL}/api/payments/verify`,
         {
-          razorpay_order_id: orderIdToUse,
+          razorpay_order_id: razorpayOrderId,
           razorpay_payment_id: paymentId,
           razorpay_signature: signature,
           orderId,
