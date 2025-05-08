@@ -69,15 +69,15 @@ const AvailableOrderCard: React.FC<AvailableOrderCardProps> = ({ order, onAccept
             />
           </svg>
           <p className="ml-2 text-sm text-gray-600">
-            {order.customerAddress.street},{" "}
-            {order.customerAddress.city},{" "}
-            {order.customerAddress.state}{" "}
-            {order.customerAddress.zipCode}
+            {order.address.street},{" "}
+            {order.address.city},{" "}
+            {order.address.state}{" "}
+            {order.address.zipCode}
           </p>
         </div>
 
         <button
-          onClick={() => onAcceptOrder(order.orderId)}
+          onClick={() => onAcceptOrder(order._id || order.orderId || "")}
           className="w-full mt-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg shadow-sm hover:from-blue-600 hover:to-blue-700 transition-all duration-200 flex items-center justify-center"
         >
           <svg viewBox="0 0 24 24" className="w-5 h-5 mr-2">

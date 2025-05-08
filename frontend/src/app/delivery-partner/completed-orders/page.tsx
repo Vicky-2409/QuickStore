@@ -128,7 +128,7 @@ export default function CompletedOrdersPage() {
             customerEmail: deliveryOrder.customerEmail,
             customerAddress: deliveryOrder.customerAddress,
             items: orderDetails.items,
-            total: orderDetails.totalAmount,
+            total: orderDetails.total,
             amount: orderDetails.items.reduce(
               (total, item) => total + item.product.price * item.quantity,
               0
