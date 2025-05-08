@@ -14,14 +14,14 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: svignesh2409/quick-store-frontend-service:v21
+          image: svignesh2409/quick-store-frontend-service:v26
           envFrom:
             - configMapRef:
                 name: frontend-env
 ---
 apiVersion: v1
 kind: Service
-metadata: 
+metadata:
   name: frontend-srv
 spec:
   selector:
